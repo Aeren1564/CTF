@@ -1,0 +1,1 @@
+hitcon{TEST_FLAG}
