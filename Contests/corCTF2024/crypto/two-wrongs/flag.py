@@ -1,0 +1,1 @@
+flag = "corctf{Test_FLAG!!!sdfazFLAGEND}"
