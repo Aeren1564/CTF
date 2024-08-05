@@ -42,8 +42,6 @@ print("y = ", y)
 
 for message in messages:
   k = bytes_to_long(xor(pad(message, 32)[::-1], otp)) # OTP secure
-  print(pad(message, 32))
-  print(hex(k))
   s, e = sign(message, k % p)
   assert (verify(s, e, message))
   print(message, sign(message, k % p))
@@ -55,4 +53,3 @@ cipher = AES.new(key, AES.MODE_CBC, iv)
 ct = cipher.encrypt(pad(flag, 16)).hex()
 print("ct = ", ct)
 print("iv = ", iv.hex())
-print(x)

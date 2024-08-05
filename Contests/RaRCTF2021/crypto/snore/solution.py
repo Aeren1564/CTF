@@ -42,7 +42,7 @@ lattice_data = [
 ]
 
 lower_bound = [1, 0, -2**88, -2**96, 0, 0]
-upper_bound = [2, p, 0, 0, 1, 1]
+upper_bound = [1, p - 1, 0, 0, 0, 0]
 
 close_vector = solve_inequality_with_CVP(lattice_data, lower_bound, upper_bound)
 
