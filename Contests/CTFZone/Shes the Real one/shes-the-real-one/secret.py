@@ -1,0 +1,1 @@
+flag = "TEST_FLAG{WTF_YOU_FOUND_THE_FLAG!!!!_GJ}"
