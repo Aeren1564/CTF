@@ -42,9 +42,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-"""
-f0 ~ a0 * sqrt(p) + b0 * sqrt(q) + c0 * sqrt(r)
-f1 ~ a1 * sqrt(p) + b1 * sqrt(q) + c1 * sqrt(r)
-f2 ~ a2 * sqrt(p) + b2 * sqrt(q) + c2 * sqrt(r)
-"""
