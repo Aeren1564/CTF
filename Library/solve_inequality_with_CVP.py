@@ -26,7 +26,7 @@ def solve_inequality_with_CVP(M, lower_bound, upper_bound):
 	for j in range(m):
 		target_vector[j] *= coef[j]
 		if target_vector[j] < lower_bound[j] or upper_bound[j] < target_vector[j]:
-			print(f"<WARNING> Inequality does not hold for {j = }")
+			print(f"<WARNING - solve_inequality_with_CVP> Inequality does not hold for {j = }")
 
 	return target_vector
 
