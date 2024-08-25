@@ -8,6 +8,23 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**SekaiCTF 2024**
+
+- [ ] sqrt163
+- [ ] Squares vs Cubes
+- [ ] zerodaycrypto
+
+**idekCTF 2024**
+
+- [ ] Baby Bundle
+- [x] Golden Ticket
+- [ ] Heaven or Hell
+- [ ] irrandomcible (Representation Theory)
+- [ ] OTRU
+- [x] Seedy (Mersenne Twister)
+- [ ] summertime
+- [ ] Tensor Glare
+
 **CTFZone 2024 Qualifier**
 
 - [ ] Cold Siemens
@@ -52,6 +69,6 @@ Repository for maintaining CTF Library and upsolving
 - [ ] BrokenShare
 - [ ] ECLOG (LLL)
 
-**RaRCTF 2024**
+**RaRCTF 2021**
 
 - [x] snore (LLL)
