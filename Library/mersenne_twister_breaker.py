@@ -46,9 +46,7 @@ class mersenne_twister_breaker:
 		mti1 = (X & 0x80000000) >> 31
 		if mti1:
 			X ^= self.A
-		mti = X << 1 & 0x80000000
-		mti1 += X << 1 & 0x7FFFFFFF
-		return mti, mti1
+		return X << 1 & 0x80000000, mti1 + (X << 1 & 0x7FFFFFFF)
 	# From https://stackered.com/blog/python-random-prediction
 	# Note that the first state value is never used except for its MSB
 	def rewind_state(self, state):
@@ -195,7 +193,7 @@ if __name__ == "__main__":
 		assert S2_[1 : ] == S2[1 : ]
 		I_ = breaker.rewind_state(breaker.rewind_state(breaker.rewind_state(S3)))
 		assert I_ == I
-		print(f"[test_recover_seed_from_state] finished")
+		print(f"[test_rewind] finished")
 
 	def test_recover_seed_from_state():
 		r = random.Random()
