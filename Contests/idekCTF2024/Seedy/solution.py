@@ -2,7 +2,7 @@ from CTF_Library import *
 import random
 
 with open("output.txt", 'r') as f:
-	out	=	f.read().strip()
+	out = f.read().strip()
 
 breaker = mersenne_twister_breaker()
 breaker.init_byteseed()
