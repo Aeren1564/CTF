@@ -99,6 +99,8 @@ class mersenne_twister_breaker:
 		assert 1 <= init_index <= self.N
 		self.n, self.recovery_mode = self.W * self.N, 0
 		self.solver = self.linear_equation_solver_F2(n = self.n)
+		for i in range(self.W):
+			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
 		self.init_index = init_index
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
 	# Goal is to recover the 32bit integer seed
