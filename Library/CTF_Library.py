@@ -2,9 +2,7 @@ from pwn import *
 from sage.all import *
 proof.all(False)
 
-from disjoint_set import *
 from linear_equation_solver_F2 import *
-from matroid_intersection import *
 from mersenne_twister_breaker import *
 from partition_point import *
 from solve_inequality_with_CVP import *
