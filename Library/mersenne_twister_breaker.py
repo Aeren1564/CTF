@@ -99,8 +99,6 @@ class mersenne_twister_breaker:
 		assert 1 <= init_index <= self.N
 		self.n, self.recovery_mode = self.W * self.N, 0
 		self.solver = self.linear_equation_solver_F2(n = self.n)
-		for i in range(self.W):
-			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
 		self.init_index = init_index
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
 	# Goal is to recover the 32bit integer seed
@@ -123,9 +121,10 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		assert 0 <= equation < 2**self.n and 0 <= output <= 1
 		eqs = 0
-		for i in range(self.n):
-			if equation >> i & 1:
-				eqs ^= self.twister.state[i]
+		for i in range(self.N):
+			for j in range(self.W):
+				if equation >> self.W * i + j & 1:
+					eqs ^= self.twister.state[self.W * i + self.W - 1 - j]
 		assert self.solver.add_equation_if_consistent(eqs, output)
 	# if x is a string, it must of length self.W consisting of characters in "01?"
 	def setrand_uint(self, x):
