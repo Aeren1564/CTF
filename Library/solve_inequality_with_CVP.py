@@ -3,6 +3,7 @@ proof.all(False)
 
 # Bounds are represented by closed intervals
 def solve_inequality_with_CVP(M, lower_bound, upper_bound):
+	print(f"<INFO - solve_inequality_with_CVP> Started")
 	mat, lb, ub = matrix(QQ, M), vector(QQ, lower_bound), vector(QQ, upper_bound)
 	assert mat.nrows() > 0
 	n, m = mat.nrows(), mat.ncols()
@@ -28,6 +29,7 @@ def solve_inequality_with_CVP(M, lower_bound, upper_bound):
 		if target_vector[j] < lower_bound[j] or upper_bound[j] < target_vector[j]:
 			print(f"<WARNING - solve_inequality_with_CVP> Inequality does not hold for {j = }")
 
+	print(f"<INFO - solve_inequality_with_CVP> Finished")
 	return target_vector
 
 """
