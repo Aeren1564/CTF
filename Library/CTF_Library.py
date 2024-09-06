@@ -5,7 +5,7 @@ proof.all(False)
 from disjoint_set import *
 from ECDSA_breaker import *
 from fermat_factorization import *
-from linear_equation_solver_F2 import *
+from linear_equation_solver_GF2 import *
 from matroid_intersection import *
 from mersenne_twister_breaker import *
 from partition_point import *
