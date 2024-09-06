@@ -124,7 +124,7 @@ class mersenne_twister_breaker:
 		for i in range(self.N):
 			for j in range(self.W):
 				if equation >> self.W * i + j & 1:
-					eqs ^= self.twister.state[self.W * i + self.W - 1 - j]
+					eqs ^= self.twister.state[i][self.W - 1 - j]
 		assert self.solver.add_equation_if_consistent(eqs, output)
 	# if x is a string, it must of length self.W consisting of characters in "01?"
 	def setrand_uint(self, x):
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 		assert S2_[1 : ] == S2[1 : ]
 		I_ = breaker.rewind_state(breaker.rewind_state(breaker.rewind_state(S3)))
 		assert I_ == I
-		print(f"[test_rewind] finished")
+		print(f"[test_rewind] Succeeded")
 
 	def test_recover_seed_from_state():
 		r = random.Random()
@@ -203,7 +203,7 @@ if __name__ == "__main__":
 		breaker = mersenne_twister_breaker()
 		recovered = breaker.recover_seed_array_from_state(r.getstate()[1], False)[2]
 		assert recovered == seed
-		print(f"[test_recover_seed_from_state] finished")
+		print(f"[test_recover_seed_from_state] Succeeded")
 
 	def test_recover_seed():
 		r = random.Random()
@@ -214,12 +214,12 @@ if __name__ == "__main__":
 		for i in range(312):
 			print(f"[test_recover_seed] {i = }")
 			breaker.setrandbits(64, r.getrandbits(64))
-		state = r.getstate()
+		state = r.getstate()[1]
 		for i in [1, 3, 10]:
 			for j in range(0, 32, 3):
-				breaker.add_equation_on_current_state(1 << self.W * i + j, state[i] >> j & 1)
+				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
 		assert breaker.recover() == seed
-		print(f"[test_recover_seed] Finished")
+		print(f"[test_recover_seed] Succeeded")
 
 	def test_recover_byteseed():
 		r = random.Random()
@@ -230,13 +230,13 @@ if __name__ == "__main__":
 		for i in range(156):
 			print(f"[test_recover_byteseed] {i = }")
 			breaker.setrandbytes(32, r.randbytes(32))
-		state = r.getstate()
+		state = r.getstate()[1]
 		for i in [1, 3, 10]:
 			for j in range(0, 32, 3):
-				breaker.add_equation_on_current_state(1 << self.W * i + j, state[i] >> j & 1)
+				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
 		recovered = breaker.recover()
 		assert recovered == byteseed
-		print(f"[test_recover_byteseed] Finished")
+		print(f"[test_recover_byteseed] Succeeded")
 
 	test_rewind()
 	test_recover_seed_from_state()
