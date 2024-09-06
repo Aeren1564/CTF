@@ -11,4 +11,5 @@ for i, b in enumerate(out):
 	print(f"{i = }")
 	breaker.setrandbits(1, int(b))
 
-print(breaker.recover())
+flag = breaker.recover()
+print(b"idek{" + flag.split(b"idek{")[1].split(b"}")[0] + b"}")
