@@ -218,6 +218,8 @@ if __name__ == "__main__":
 		for i in [1, 3, 10]:
 			for j in range(0, 32, 3):
 				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
+		for i in range(10):
+			breaker.setrandbits(12, r.getrandbits(12))
 		assert breaker.recover() == seed
 		print(f"[test_recover_seed] Succeeded")
 
@@ -234,6 +236,8 @@ if __name__ == "__main__":
 		for i in [1, 3, 10]:
 			for j in range(0, 32, 3):
 				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
+		for i in range(10):
+			breaker.setrandbytes(3, r.randbytes(3))
 		recovered = breaker.recover()
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Succeeded")
