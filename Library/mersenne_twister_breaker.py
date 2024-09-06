@@ -1,6 +1,6 @@
 class mersenne_twister_breaker:
 	from symbolic_mersenne_twister import symbolic_mersenne_twister
-	from linear_equation_solver_F2 import linear_equation_solver_F2
+	from linear_equation_solver_GF2 import linear_equation_solver_GF2
 	recovery_mode = None
 	W, N, M, R = 32, 624, 397, 31
 	A = 0x9908B0DF
@@ -98,13 +98,13 @@ class mersenne_twister_breaker:
 	def init_state(self, init_index):
 		assert 1 <= init_index <= self.N
 		self.n, self.recovery_mode = self.W * self.N, 0
-		self.solver = self.linear_equation_solver_F2(n = self.n)
+		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		self.init_index = init_index
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
 	# Goal is to recover the 32bit integer seed
 	def init_seed(self):
 		self.n, self.recovery_mode = self.W * self.N, 1
-		self.solver = self.linear_equation_solver_F2(n = self.n)
+		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		for i in range(self.W):
 			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
 		self.init_index = self.N
@@ -112,7 +112,7 @@ class mersenne_twister_breaker:
 	# Goal is to recover the byte seed
 	def init_byteseed(self):
 		self.n, self.recovery_mode = self.W * self.N, 2
-		self.solver = self.linear_equation_solver_F2(n = self.n)
+		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		for i in range(self.W):
 			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
 		self.init_index = self.N
@@ -214,6 +214,10 @@ if __name__ == "__main__":
 		for i in range(312):
 			print(f"[test_recover_seed] {i = }")
 			breaker.setrandbits(64, r.getrandbits(64))
+		state = r.getstate()
+		for i in [1, 3, 10]:
+			for j in range(0, 32, 3):
+				breaker.add_equation_on_current_state(1 << self.W * i + j, state[i] >> j & 1)
 		assert breaker.recover() == seed
 		print(f"[test_recover_seed] Finished")
 
@@ -226,6 +230,10 @@ if __name__ == "__main__":
 		for i in range(156):
 			print(f"[test_recover_byteseed] {i = }")
 			breaker.setrandbytes(32, r.randbytes(32))
+		state = r.getstate()
+		for i in [1, 3, 10]:
+			for j in range(0, 32, 3):
+				breaker.add_equation_on_current_state(1 << self.W * i + j, state[i] >> j & 1)
 		recovered = breaker.recover()
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Finished")
