@@ -1,14 +1,29 @@
 from pwn import *
 from sage.all import *
 proof.all(False)
+from Crypto.Util.number import *
 
-from disjoint_set import *
-from ECDSA_breaker import *
-from fermat_factorization import *
-from linear_equation_solver_GF2 import *
-from matroid_intersection import *
-from mersenne_twister_breaker import *
-from partition_point import *
-from solve_inequality_with_CVP import *
-from solve_truncated_homogeneous_LCG import *
-from symbolic_mersenne_twister import *
+# Import everything under this folder
+import os
+folder_path = os.path.dirname(os.path.realpath(__file__))
+loaded_modules = set()
+for dirpath, _, filenames in os.walk(folder_path):
+	if "__pycache__" in dirpath:
+		continue
+	for filename in filenames:
+		if not filename.endswith(".py") or filename == "CTF_Library.py":
+			continue
+		module_name = filename[:-3]
+		if module_name in loaded_modules:
+			continue
+		module_path = os.path.join(dirpath, filename)
+		import importlib.util
+		spec = importlib.util.spec_from_file_location(module_name, module_path)
+		module = importlib.util.module_from_spec(spec)
+		try:
+			spec.loader.exec_module(module)
+		except Exception as e:
+			print(f"Error importing {module_name}: {e}")
+			continue
+		globals().update(vars(module))
+		loaded_modules.add(module_name)
