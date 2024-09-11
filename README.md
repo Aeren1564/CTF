@@ -18,7 +18,7 @@ Repository for maintaining CTF Library and upsolving
 **WMCTF 2024**
 
 - [ ] C O N N E C T 1 0 N
-- [ ] FACRT
+- [x] FACRT
 - [ ] Matrix3
 - [x] RSA
 - [ ] Turing
