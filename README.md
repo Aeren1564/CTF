@@ -8,6 +8,38 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**COMPFESTCTF 2024**
+
+- [ ] All My Apes Are Gone
+- [ ] Forge Me if You Can
+- [ ] Prime Rotation
+- [ ] money gone, wallet also gone
+
+**WMCTF 2024**
+
+- [ ] C O N N E C T 1 0 N
+- [ ] FACRT
+- [ ] Matrix3
+- [x] RSA
+- [ ] Turing
+- [ ] k_cessation
+
+**bhmea 2024 Qualifier**
+
+- [ ] Cheeky (Threading)
+- [ ] SqarSign
+- [ ] Trypanophobia
+
+**CyberSpaceCTF 2024**
+
+- [ ] Connorsmith
+- [x] ezcoppersmith
+- [x] flagprinter
+- [ ] Mask-RSA
+- [ ] super-fnv
+- [ ] trendy windy trigonity
+- [ ] Two Many Hints
+
 **SekaiCTF 2024**
 
 - [ ] sqrt163
