@@ -1,7 +1,9 @@
 from sage.all import *
 proof.all(False)
 
-# Bounds are represented by closed intervals
+# Source: https://github.com/rkm0959/Inequality_Solving_with_CVP/blob/main/solver.sage
+# Given n variables x_0, \cdots, x_{n-1} and m inequalties lower_bound[j] <= \sum_{i=0}^{N-1} M[i][j] * x[i] <= upper_bound[j],
+# Try finding a feasible solution with CVP
 def solve_inequality_with_CVP(M, lower_bound, upper_bound):
 	print(f"<INFO - solve_inequality_with_CVP> Started")
 	mat, lb, ub = matrix(QQ, M), vector(QQ, lower_bound), vector(QQ, upper_bound)
@@ -9,6 +11,20 @@ def solve_inequality_with_CVP(M, lower_bound, upper_bound):
 	n, m = mat.nrows(), mat.ncols()
 	assert len(lower_bound) == m and len(upper_bound) == m
 	assert all(lower_bound[i] <= upper_bound[i] for i in range(m))
+
+	if n == m:
+		det = abs(mat.determinant())
+		if det == 0:
+			print(f"<INFO - solve_inequality_with_CVP> Zero determinant")
+		else:
+			# Gaussian heuristic
+			solution_count = 1
+			for l, u in zip(lower_bound, upper_bound):
+				solution_count *= u - l
+			solution_count /= det
+			print(f"<INFO - solve_inequality_with_CVP> Expected number of solutions: {int(solution_count) + 1}")
+	else:
+		print(f"<INFO - solve_inequality_with_CVP> {n} != {m}")
 
 	coef = [QQ(max(abs(lower_bound[i]), abs(upper_bound[i]))) for i in range(m)]
 	for i in range(n):
@@ -27,7 +43,7 @@ def solve_inequality_with_CVP(M, lower_bound, upper_bound):
 	for j in range(m):
 		target_vector[j] *= coef[j]
 		if target_vector[j] < lower_bound[j] or upper_bound[j] < target_vector[j]:
-			print(f"<WARNING - solve_inequality_with_CVP> Inequality does not hold for {j = }")
+			print(f"<WARNING - solve_inequality_with_CVP> Inequality does not hold at index {j}")
 
 	print(f"<INFO - solve_inequality_with_CVP> Finished")
 	return target_vector
