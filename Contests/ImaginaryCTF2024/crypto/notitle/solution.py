@@ -1,5 +1,4 @@
 from sage.all import *
-from temp import *
 
 proof.all(False)
 

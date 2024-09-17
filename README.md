@@ -8,6 +8,13 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**m0lec0nCTF 2025 Qualifier**
+
+- [x] ECSign
+- [x] Quadratic Leak
+- [x] Talor
+- [x] Yet Another OT
+
 **COMPFESTCTF 2024**
 
 - [ ] All My Apes Are Gone
