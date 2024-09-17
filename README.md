@@ -12,8 +12,8 @@ Repository for maintaining CTF Library and upsolving
 
 - [x] ECSign
 - [x] Quadratic Leak
-- [x] Talor
-- [x] Yet Another OT
+- [x] Talor (Multiprocessing)
+- [x] Yet Another OT (Quadratic Residue)
 
 **COMPFESTCTF 2024**
 
@@ -25,9 +25,9 @@ Repository for maintaining CTF Library and upsolving
 **WMCTF 2024**
 
 - [ ] C O N N E C T 1 0 N
-- [x] FACRT
+- [x] FACRT (Fault attack on RSA-CRT https://eprint.iacr.org/2024/1125.pdf)
 - [ ] Matrix3
-- [x] RSA
+- [x] RSA (Quaternion)
 - [ ] Turing
 - [ ] k_cessation
 
@@ -44,7 +44,7 @@ Repository for maintaining CTF Library and upsolving
 - [x] flagprinter
 - [ ] Mask-RSA
 - [ ] super-fnv
-- [ ] trendy windy trigonity
+- [x] trendy windy trigonity (LLL)
 - [ ] Two Many Hints
 
 **SekaiCTF 2024**
