@@ -18,38 +18,11 @@ def magic_op(x, n: int):
 			r1 = 2 * r1**2 - 1
 	return r0
 
-polys = []
-for n in range(20):
-	poly = magic_op(X, n)
-	print(f"{n = }")
-	print(poly)
-	if n >= 2:
-		print(2 * X * polys[-1] - polys[-2])
-	print()
-	polys.append(poly)
 
 pi = F(314159)
 e = F(271828)
-magic_pi = F(magic_pi)
-magic_e = F(magic_e)
-pi_sqrt = pi + (pi * pi - 1).sqrt(extend = True)
-e_sqrt = e + (e * e - 1).sqrt(extend = True)
+print(f"{pi = }, {magic_op(magic_op(pi, 123), p - 1) = }")
+print(f"{pi = }, {magic_op(magic_op(pi, 123), p + 1) = }")
+print(f"{e = }, {magic_op(e, p - 1) = }")
+print(f"{e = }, {magic_op(e, p + 1) = }")
 
-for i in range(100):
-	assert magic_op(pi, i) == (pi_sqrt**i + (1 / pi_sqrt)**i) / 2
-	assert magic_op(e, i) == (e_sqrt**i + (1 / e_sqrt)**i) / 2
-
-def get_sqrt_power(magic : F):
-	return magic + (magic * magic - 1).sqrt(extend = True)
-
-assert pi_sqrt**1234 == get_sqrt_power(magic_op(pi, 1234)) or pi_sqrt**1234 == 1 / get_sqrt_power(magic_op(pi, 1234))
-
-rem = p - 1
-pfactors = [2, 2, 2, 2, 3, 3, 5, 5, 7, 11, 19, 29, 31, 37, 41, 61, 331, 3433, 22381, 59011, 903151, 407716853, 1344521821, 1440133381, 1827022597, 1972851313, 9985849697, 29986907677, 1043610062213431, 6247344214605031, 1853188607292839129, 721894921019602741141, 74576417137095369213842943694021]
-for x in pfactors:
-	assert x in Primes()
-	assert rem % x == 0
-	rem //= x
-
-print(rem, len(bin(rem)))
-assert rem in Primes()
