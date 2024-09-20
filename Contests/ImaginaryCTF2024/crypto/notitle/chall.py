@@ -38,7 +38,6 @@ if __name__ == "__main__":
     ct = cipher.encrypt(flag)
     iv = cipher.nonce
 
-    print(f"{p = }")
     print(f"{magic_pi = }")
     print(f"{magic_e = }")
     print(f"{obfuscated_keys = }")
