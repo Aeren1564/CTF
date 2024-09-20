@@ -10,4 +10,4 @@ def solve_ACD(rho : int, s : list):
 		[matrix([2**rho]), matrix(s[1 : ])],
 		[zero_matrix(len(s) - 1, 1), -s[0] * identity_matrix(len(s) - 1)]
 	]).LLL()[0][0] >> rho
-	return (s[0] - s[0] % p0) // p0
+	return int(s[0] - s[0] % p0) // p0

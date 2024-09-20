@@ -159,7 +159,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		assignment, basis = self.solver.solve()
 		if len(basis) != 0:
-			print("<WARNING - mersenne_twister_breaker> Non-unique solution")
+			print("[WARNING] <mersenne_twister_breaker> Multiple solutions")
 		state = [assignment >> self.W * i & self.D for i in range(self.N)] + [self.init_index]
 		if self.recovery_mode == 0:
 			return (3, tuple(state), None)
@@ -173,7 +173,7 @@ class mersenne_twister_breaker:
 			for l in range(len(pref) - 12):
 				if sha512(pref[-l : ]).digest()[ : -8] == h[ : -8]:
 					return pref[-l : ]
-			print("<ERROR - mersenne_twister_breaker> Failed to recover the seed")
+			print("[ERROR] <mersenne_twister_breaker> Failed to recover the seed")
 			assert False
 
 if __name__ == "__main__":
