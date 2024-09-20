@@ -1,7 +1,6 @@
 from CTF_Library import *
 from Crypto.Util.number import *
 from hashlib import sha224
-from Crypto.Cipher import AES
 
 p =  148982911401264734500617017580518449923542719532318121475997727602675813514863
 g =  2
@@ -31,27 +30,10 @@ iv = bytes.fromhex("563391612e7c7d3e6bd03e1eaf76a0ba")
 s = [x[0] for x in signs]
 e = [x[1] for x in signs]
 
-# (1, x, -y0, -y1, 0, 0) as vec
-lattice_data = [
-	[1, 0, 0, 0, s[4] - s[0], s[3] - s[1]],
-	[0, 1, 0, 0, e[4] - e[0], e[3] - e[1]],
-	[0, 0, 1, 0, 2**96,       0          ],
-	[0, 0, 0, 1, 0,           2**96      ],
-	[0, 0, 0, 0, p - 1,       0          ],
-	[0, 0, 0, 0, 0,           p - 1      ]
-]
+solver = inequality_solver_with_SVP([1, 0, -2**88, 0], [1, p - 1, 0, 2**96])
+solver.add_equality([s[4] - s[0], e[4] - e[0], 2**96, 0], 0, p - 1)
+solver.add_equality([s[3] - s[1], e[3] - e[1], 0, 2**96], 0, p - 1)
 
-lower_bound = [1, 0, -2**88, -2**96, 0, 0]
-upper_bound = [1, p - 1, 0, 0, 0, 0]
-
-close_vector = solve_inequality_with_CVP(lattice_data, lower_bound, upper_bound)
-
-print(close_vector)
-
-x = int(close_vector[1])
-
-key = sha224(long_to_bytes(x)).digest()[:16]
-
+key = sha224(long_to_bytes(solver.solve()[0][0][1])).digest()[:16]
 cipher = AES.new(key, AES.MODE_CBC, iv)
-
 print(cipher.decrypt(ct))
