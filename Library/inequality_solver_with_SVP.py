@@ -27,7 +27,7 @@ class inequality_solver_with_SVP:
 	def add_equality(self, coef : list, value : int, mod = 0):
 		self.add_inequality(coef, value, value, mod)
 	# Try different construction if # of estimated solutions (by Gaussian heuristic) is too large
-	def solve(self):
+	def solve(self, print_lattice = False):
 		print(f"[STARTED] <inequality_solver_with_SVP>")
 		n, m = self.n, len(self.coefs)
 		mat = identity_matrix(ZZ, n).augment(matrix(ZZ, self.coefs).T)
@@ -74,6 +74,8 @@ class inequality_solver_with_SVP:
 		for row in mat:
 			if not 0 <= row[-1] <= 1:
 				continue
+			if print_lattice:
+				print(f"[INFO] {row = }")
 			assigned_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n)]
 			equation_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n, n + m)]
 			if any(not self.var_low[i] <= assigned_value[i] <= self.var_high[i] for i in range(n)):
