@@ -1,1 +1,0 @@
-hitcon{test_flag}

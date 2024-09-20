@@ -89,7 +89,7 @@ Repository for maintaining CTF Library and upsolving
 - [ ] integrity
 - [ ] lcasm
 - [x] lf3r (LCG)
-- [ ] notitle
+- [x] notitle (Chebyshev Polynomial, LLL https://www.sciencedirect.com/science/article/abs/pii/S0020019010003170)
 - [ ] pacap
 - [ ] solitude
 - [x] tango (Stream Cipher)
@@ -107,6 +107,10 @@ Repository for maintaining CTF Library and upsolving
 
 - [ ] BrokenShare
 - [ ] ECLOG (LLL)
+- [ ] Hyper512
+- [ ] MatProd
+- [ ] PCBC Revenge
+- [ ] ZKPoF
 
 **RaRCTF 2021**
 

@@ -1,24 +1,19 @@
 import numpy as np
 from Crypto.Cipher import AES
 from hashlib import sha256
-import random
+from random import SystemRandom
 import sys
-from typing import List
-
-random.seed(12345)
 
 p = 65537
+rand = SystemRandom()
+
 
 def share(secret: bytes, n: int, t: int):
     # (t, n) secret sharing
-
-    # P \in GF(p)[X], len(P) = t -> random
-
-    poly = np.array([random.randrange(0, p) for _ in range(t)])
+    poly = np.array([rand.randrange(0, p) for _ in range(t)])
     f = lambda x: int(np.polyval(poly, x) % p)
 
-    # length n, random number in (t, p)
-    xs = random.sample(range(t, p), n)
+    xs = rand.sample(range(t, p), n)
     ys = [f(x) for x in xs]
     shares = [(int(x), int(y)) for x, y in zip(xs, ys)]
 
@@ -29,7 +24,7 @@ def share(secret: bytes, n: int, t: int):
     return ct, shares
 
 
-def interpolate(xs: List[int], ys: List[int], x: int):
+def interpolate(xs: list[int], ys: list[int], x: int):
     n = len(xs)
     assert n == len(ys)
     res = 0
@@ -59,7 +54,7 @@ def sanity_check():
 
 
 if __name__ == "__main__":
-    # sanity_check()
+    sanity_check()
     with open("flag.txt", "rb") as f:
         flag = f.read().strip()
     ct, shares = share(flag, 48, 24)
