@@ -8,6 +8,15 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**PatriotCTF 2024**
+
+- [ ] High Roller
+- [x] idk cipher
+- [x] One for you, one for me
+- [x] Protected Console (Padding oracle attack on AES CBC cipher)
+- [ ] Scrambler V2
+- [ ] Textbook Schnorr right
+
 **m0lec0nCTF 2025 Qualifier**
 
 - [x] ECSign
