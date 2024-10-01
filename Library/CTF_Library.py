@@ -1,19 +1,5 @@
-from sage.all import *
-proof.all(False)
-from Crypto.Cipher import AES
-from Crypto.Util.number import *
-from Crypto.Util.Padding import pad, unpad
-from pwn import *
-
-from multiprocessing import Pool
-import itertools
-import random
-import traceback
-import os
-import json
-import re
-
 # Import everything under this folder
+import os
 folder_path = os.path.dirname(os.path.realpath(__file__))
 loaded_modules = set()
 for dirpath, _, filenames in os.walk(folder_path):
@@ -36,3 +22,18 @@ for dirpath, _, filenames in os.walk(folder_path):
 			continue
 		globals().update(vars(module))
 		loaded_modules.add(module_name)
+
+from sage.all import *
+proof.all(False)
+from Crypto.Cipher import AES
+from Crypto.Util.number import *
+from Crypto.Util.Padding import pad, unpad
+from pwn import *
+
+from multiprocessing import Pool
+import itertools
+import random
+import traceback
+import os
+import json
+import re
