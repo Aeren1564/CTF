@@ -8,6 +8,14 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**BuckeyeCTF 2024**
+
+- [x] hashbrown
+- [x] rsa
+- [x] treestore
+- [x] xnor
+- [x] zkwarmup
+
 **PatriotCTF 2024**
 
 - [ ] High Roller
