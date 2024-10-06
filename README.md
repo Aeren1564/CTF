@@ -8,6 +8,13 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**IronCTF 2024**
+
+- [x] Backdoor (Singular curve attack on elliptic curve)
+- [x] Minecraft cipher (Bruteforce)
+- [x] Rivest, Shamir, Aldeman 1 (Coppersmith)
+- [x] Rivest, Shamir, Aldeman 2
+
 **BuckeyeCTF 2024**
 
 - [x] hashbrown
@@ -18,12 +25,9 @@ Repository for maintaining CTF Library and upsolving
 
 **PatriotCTF 2024**
 
-- [ ] High Roller
 - [x] idk cipher
 - [x] One for you, one for me
 - [x] Protected Console (Padding oracle attack on AES CBC cipher)
-- [ ] Scrambler V2
-- [ ] Textbook Schnorr right
 
 **m0lec0nCTF 2025 Qualifier**
 
@@ -31,13 +35,6 @@ Repository for maintaining CTF Library and upsolving
 - [x] Quadratic Leak
 - [x] Talor (Multiprocessing)
 - [x] Yet Another OT (Quadratic Residue)
-
-**COMPFESTCTF 2024**
-
-- [ ] All My Apes Are Gone
-- [ ] Forge Me if You Can
-- [ ] Prime Rotation
-- [ ] money gone, wallet also gone
 
 **WMCTF 2024**
 
@@ -47,12 +44,6 @@ Repository for maintaining CTF Library and upsolving
 - [x] RSA (Quaternion)
 - [ ] Turing
 - [ ] k_cessation
-
-**bhmea 2024 Qualifier**
-
-- [ ] Cheeky (Threading)
-- [ ] SqarSign
-- [ ] Trypanophobia
 
 **CyberSpaceCTF 2024**
 
@@ -80,11 +71,6 @@ Repository for maintaining CTF Library and upsolving
 - [x] Seedy (Mersenne Twister)
 - [ ] summertime
 - [ ] Tensor Glare
-
-**CTFZone 2024 Qualifier**
-
-- [ ] Cold Siemens
-- [ ] Shes the Real one
 
 **CrewCTF 2024**    
 
