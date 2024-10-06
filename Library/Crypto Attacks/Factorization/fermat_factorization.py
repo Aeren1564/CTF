@@ -14,3 +14,8 @@ def fermat_factorization(n : int):
 		a += 1
 		b2 = a**2 - n
 	return a - int(ceil(gmpy2.sqrt(b2)))
+
+"""
+Tested on
+- CyberSpaceCTF2024/crypto/ezcoppersmith
+"""

@@ -8,7 +8,8 @@ breaker = mersenne_twister_breaker()
 breaker.init_byteseed()
 
 for i, b in enumerate(out):
-	print(f"{i = }")
+	if i % 1000 == 0:
+		print(f"{i = }")
 	breaker.setrandbits(1, int(b))
 
 flag = breaker.recover()
