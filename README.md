@@ -8,6 +8,13 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**Alpacahack2024 Round 3**
+
+- [x] a-dance-of-add-and-mul (Isogeny, Weil Pairing)
+- [x] hat-trick (Rolling Hash, LLL)
+- [x] qrime
+- [x] rainbow-sweet-alchemist
+
 **IronCTF 2024**
 
 - [x] Backdoor (Singular curve attack on elliptic curve)
