@@ -8,6 +8,22 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**BlueWaterCTF 2024**
+
+- [ ] Collider
+- [ ] Counter Strike
+- [ ] Fruit Math
+- [ ] Kyber Noncense
+- [ ] MD5.01
+- [ ] MD5.1
+
+**AlpacaHack 2024 Round 4**
+
+- [ ] broadcasting-ntru
+- [x] nnnn (Approximate Common Divisor)
+- [ ] schnorrlcg
+- [x] xorshift-stream
+
 **TCP1PCTF 2024**
 
 - [x] molecular cryptography
