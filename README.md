@@ -8,7 +8,15 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
-**AlpacaHack2024 Round 3**
+**TCP1PCTF 2024**
+
+- [x] molecular cryptography
+- [x] molecular cryptography revenge
+- [x] talking phase
+- [x] TCP51Prime
+- [x] whats the worst that could happen
+
+**AlpacaHack 2024 Round 3**
 
 - [x] a-dance-of-add-and-mul (Isogeny, Weil Pairing)
 - [x] hat-trick (Rolling Hash, LLL)
