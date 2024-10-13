@@ -35,9 +35,13 @@ proof.all(False)
 from Crypto.Cipher import AES
 from Crypto.Util.number import *
 from Crypto.Util.Padding import pad, unpad
+from hashlib import sha512
 from pwn import *
 
 from multiprocessing import Pool
+from gmpy2 import isqrt, iroot
+import numpy as np
+import base64
 import itertools
 import random
 import traceback

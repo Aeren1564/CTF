@@ -8,7 +8,7 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
-**Alpacahack2024 Round 3**
+**AlpacaHack2024 Round 3**
 
 - [x] a-dance-of-add-and-mul (Isogeny, Weil Pairing)
 - [x] hat-trick (Rolling Hash, LLL)
