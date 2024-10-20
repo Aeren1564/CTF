@@ -31,21 +31,29 @@ for dirpath, directory_names, filenames in os.walk(folder_path):
 		loaded_modules.add(module_name)
 
 from sage.all import *
+from sage.rings.factorint import factor_trial_division
 proof.all(False)
 from Crypto.Cipher import AES
-from Crypto.Util.number import *
+from Crypto.Util.number import bytes_to_long, long_to_bytes, inverse, ceil_div, size, isPrime, getPrime, getStrongPrime, getRandomInteger, getRandomNBitInteger, getRandomRange
 from Crypto.Util.Padding import pad, unpad
-from hashlib import sha512
+import hashlib
 from pwn import *
 
 from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
 from gmpy2 import isqrt, iroot
-import numpy as np
+from ast import literal_eval
+import string
+import numpy
 import base64
 import itertools
 import random
+import requests
+import re
 import traceback
 import os
 import json
-import re
-import ast
+import zlib
+
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

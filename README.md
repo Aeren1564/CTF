@@ -8,6 +8,13 @@ Repository for maintaining CTF Library and upsolving
 
 ## Crypto
 
+**Hack.luCTF 2024**
+
+- [ ] FluxKey Control
+- [ ] McEliece Weight Lifting
+- [ ] Pay To Gym
+- [ ] Pump It Up
+
 **BlueWaterCTF 2024**
 
 - [ ] Collider
