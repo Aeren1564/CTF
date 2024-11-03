@@ -2,9 +2,8 @@ from sage.all import *
 proof.all(False)
 # Source: https://eprint.iacr.org/2024/1125.pdf
 # 'A'pproximate 'C'ommon 'D'ivisor problem
-# Given s_i, return p_0 which satisfies the set of equations s_i = r_i + q * p_i where 0 <= r_i < 2**len_r and q.bit_length() > len_r
-# It tries to maximize q
-def solve_ACD(s : list, len_r : int, len_q : int):
+# Given s_i, returns the minimum p_0 which satisfies the set of equations s_i = r_i + q * p_i where 0 <= r_i < 2**len_r and q.bit_length() > len_r
+def AGCD(s : list, len_r : int, len_q : int):
 	s = list(map(int, s))
 	assert 0 < len_r < len_q and len(s) >= 2
 	len_s = max(x.bit_length() for x in s)

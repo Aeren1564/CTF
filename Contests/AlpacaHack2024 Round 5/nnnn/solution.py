@@ -14,7 +14,7 @@ ct = [
 ]
 e = 0x10001
 
-d1 = 2 * solve_ACD([n[i] - n[0] for i in range(1, 4)], 384, 768)
+d1 = 2 * AGCD([n[i] - n[0] for i in range(1, 4)], 384, 768)
 p_q = (n[1] - n[0] - d1 * d1) // d1
 
 p = int(solve(x**2 - p_q * x + n[0], x)[0].rhs())

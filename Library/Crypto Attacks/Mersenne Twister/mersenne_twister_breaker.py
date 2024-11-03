@@ -106,7 +106,7 @@ class mersenne_twister_breaker:
 		self.n, self.recovery_mode = self.W * self.N, 1
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		for i in range(self.W):
-			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
+			assert self.solver.add_equation_if_consistent(1 << i, 1 if i == self.W - 1 else 0)
 		self.init_index = self.N
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
 	# Goal is to recover the byte seed
@@ -114,7 +114,7 @@ class mersenne_twister_breaker:
 		self.n, self.recovery_mode = self.W * self.N, 2
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		for i in range(self.W):
-			assert self.solver.add_equation_if_consistent(1 << i, int(i == self.W - 1))
+			assert self.solver.add_equation_if_consistent(1 << i, 1 if i == self.W - 1 else 0)
 		self.init_index = self.N
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
 	def add_equation_on_current_state(self, equation, output):
@@ -159,7 +159,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		assignment, basis = self.solver.solve()
 		if len(basis) != 0:
-			print("[WARNING] <mersenne_twister_breaker> Multiple solutions")
+			print(f"[WARNING] <mersenne_twister_breaker> {2**len(basis)} solutions")
 		state = [assignment >> self.W * i & self.D for i in range(self.N)] + [self.init_index]
 		if self.recovery_mode == 0:
 			return (3, tuple(state), None)

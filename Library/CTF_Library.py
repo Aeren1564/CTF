@@ -40,9 +40,10 @@ import hashlib
 from pwn import *
 
 from multiprocessing import Pool
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from gmpy2 import isqrt, iroot
 from ast import literal_eval
+from copy import deepcopy
 import string
 import numpy
 import base64
