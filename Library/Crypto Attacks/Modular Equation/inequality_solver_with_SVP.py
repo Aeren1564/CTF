@@ -20,8 +20,8 @@ class inequality_solver_with_SVP:
 		assert len(coef) == self.n
 		assert low <= high
 		self.coefs.append(list(map(int, coef)))
-		self.lows.append(low)
-		self.highs.append(high)
+		self.lows.append(int(low))
+		self.highs.append(int(high))
 		self.mods.append(int(mod))
 	# Add equality coef[0] * x[0] + ... + coef[-1] * x[-1] + t * mod = value
 	def add_equality(self, coef : list, value : int, mod = 0):
