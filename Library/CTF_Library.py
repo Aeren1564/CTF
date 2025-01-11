@@ -38,6 +38,7 @@ from Crypto.Util.number import bytes_to_long, long_to_bytes, inverse, ceil_div, 
 from Crypto.Util.Padding import pad, unpad
 import hashlib
 from pwn import *
+from base64 import b64encode, b64decode
 
 from multiprocessing import Pool
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -46,7 +47,6 @@ from ast import literal_eval
 from copy import deepcopy
 import string
 import numpy
-import base64
 import itertools
 import random
 import requests

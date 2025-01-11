@@ -2,7 +2,9 @@
 # 1. for all index i with low <= i < p, pred(i) = True and
 # 2. for all index i with p <= i < high, pred(i) = False
 def partition_point(low: int, high: int, pred):
-	assert low < high
+	assert low <= high
+	if low == high or not pred(low):
+		return low
 	while high - low >= 2:
 		mid = (low + high) // 2
 		if pred(mid):
