@@ -1,6 +1,6 @@
 class mersenne_twister_breaker:
 	from symbolic_mersenne_twister import symbolic_mersenne_twister
-	from linear_equation_solver_GF2 import linear_equation_solver_GF2
+	from NumberTheory.linear_equation_solver_GF2 import linear_equation_solver_GF2
 	recovery_mode = None
 	W, N, M, R = 32, 624, 397, 31
 	A = 0x9908B0DF
