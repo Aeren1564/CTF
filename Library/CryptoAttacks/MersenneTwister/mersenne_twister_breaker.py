@@ -253,18 +253,12 @@ if __name__ == "__main__":
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Succeeded")
 
-	#test_rewind()
-	#test_recover_seed_from_state()
+	test_rewind()
+	test_recover_seed_from_state()
 	test_recover_seed()
-	#test_recover_byteseed()
+	test_recover_byteseed()
 
 """
 Tested on
 - idekCTF2024/crypto/Seedy
-"""
-
-"""
-['0x0', '0xadd36a2', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x3394fa85']
-
-['0x0', '0xadd36a2', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x3394fa85']
 """
