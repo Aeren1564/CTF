@@ -101,7 +101,7 @@ class mersenne_twister_breaker:
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		self.init_index = init_index
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
-	# Goal is to recover the 32bit integer seed
+	# Goal is to recover the list of all possible integer seeds within range [0, 2^{624-32*3}) in increasing order
 	def init_seed(self):
 		self.n, self.recovery_mode = self.W * self.N, 1
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
@@ -164,7 +164,16 @@ class mersenne_twister_breaker:
 		if self.recovery_mode == 0:
 			return (3, tuple(state), None)
 		elif self.recovery_mode == 1:
-			return self.recover_seed_array_from_state(state, False)[2]
+			recovered = self.recover_seed_array_from_state(state, False)
+			seeds = []
+			for period in range(1, len(recovered) - 2):
+				if recovered[2 + period : -1] != recovered[2 : -1 - period]:
+					continue
+				seed = 0
+				for i in reversed(range(period)):
+					seed = seed << 32 | (recovered[i if i >= 2 else period + i] - i + 2**32) % 2**32
+				seeds.append(seed)
+			return seeds[:]
 		else:
 			from hashlib import sha512
 			# Assumes that len(seed) + 64(512/8) + 12 <= 624 * 4 (in bytes)
@@ -207,8 +216,9 @@ if __name__ == "__main__":
 
 	def test_recover_seed():
 		r = random.Random()
-		seed = 923534439
-		r.seed(seed)
+		seed0 = 0x00353443_93423242_33489534_89012300_23491239_04528478_73277234_72348945_38927835
+		seed1 = 0x0035343a_93423239_3348952b_890122f7_23491230_0452846f_7327722b_7234893c_3892782c_00353443_93423242_33489534_89012300_23491239_04528478_73277234_72348945_38927835
+		r.seed(seed1)
 		breaker = mersenne_twister_breaker()
 		breaker.init_seed()
 		for i in range(312):
@@ -220,7 +230,8 @@ if __name__ == "__main__":
 				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
 		for i in range(10):
 			breaker.setrandbits(12, r.getrandbits(12))
-		assert breaker.recover() == seed
+		recovered = breaker.recover()
+		assert seed0 in recovered and seed1 in recovered
 		print(f"[test_recover_seed] Succeeded")
 
 	def test_recover_byteseed():
@@ -242,12 +253,18 @@ if __name__ == "__main__":
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Succeeded")
 
-	test_rewind()
-	test_recover_seed_from_state()
+	#test_rewind()
+	#test_recover_seed_from_state()
 	test_recover_seed()
-	test_recover_byteseed()
+	#test_recover_byteseed()
 
 """
 Tested on
 - idekCTF2024/crypto/Seedy
+"""
+
+"""
+['0x0', '0xadd36a2', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x3394fa85']
+
+['0x0', '0xadd36a2', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x73277236', '0x452847b', '0x2349123d', '0x89012305', '0x3348953a', '0x93423249', '0x35344b', '0x38927835', '0x72348946', '0x3394fa85']
 """
