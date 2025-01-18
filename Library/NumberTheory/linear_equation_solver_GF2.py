@@ -14,16 +14,17 @@ class linear_equation_solver_GF2:
 		if not self._valid or len(self._unprocessed) == 0:
 			return
 		from concurrent.futures import ThreadPoolExecutor
-		self._unprocessed.insert(0, self.equations_and_outputs)
+		self._unprocessed = [self.equations_and_outputs[:]] + [[v] for v in self._unprocessed]
 		while len(self._unprocessed) >= 2:
+			print(f"[linear_equation_solver_GF2] flushing {len(self._unprocessed)} groups")
 			if len(self._unprocessed) % 2 == 1:
 				self._unprocessed.append([])
 			n = len(self._unprocessed)
-			unprocessed_next = [[] for _ in len(self._unprocessed) / 2]
+			unprocessed_next = [[] for _ in range(n // 2)]
 			def merge(i):
 				merged = self._unprocessed[i][:]
 				for v in self._unprocessed[i + 1]:
-					v = _reduce(merged, v)
+					v = self._reduce(merged, v)
 					if v == 0:
 						continue
 					if v == 1:
