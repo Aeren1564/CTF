@@ -58,3 +58,5 @@ import zlib
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+flag_char_set = "_{}" + string.ascii_letters + string.digits + string.punctuation
