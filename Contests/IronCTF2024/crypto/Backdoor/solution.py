@@ -27,7 +27,7 @@ Q = EC(137281564215976890139225160114831726699, 11198324763299063109710421816973
 Sx = F(222485190245526863452994827085862802196)
 Sy = (Sx**3 + a * Sx + b).sqrt()
 
-prng = Dual_EC(EC_singular_curve_attack(p, 0, a, b, Q, (Sx, Sy)), P, Q)
+prng = Dual_EC(singular_elliptic_curve_DLP(p, 0, a, b, Q, (Sx, Sy)), P, Q)
 assert prng.gen_rand_num() == 222485190245526863452994827085862802196
 
 key = long_to_bytes((prng.gen_rand_num() << 128) + prng.gen_rand_num())
