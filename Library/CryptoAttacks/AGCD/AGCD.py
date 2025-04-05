@@ -12,6 +12,7 @@ def AGCD(s : list, len_r : int, len_q : int):
 	for row in block_matrix([[matrix([2**len_r]), matrix(s[1 : ])], [zero_matrix(len(s) - 1, 1), -s[0] * identity_matrix(len(s) - 1)]]).LLL():
 		if row[0] != 0:
 			return abs(row[0]) >> len_r
+	assert False
 
 """
 Tested on

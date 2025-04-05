@@ -36,6 +36,7 @@ proof.all(False)
 from Crypto.Cipher import AES
 from Crypto.Util.number import bytes_to_long, long_to_bytes, inverse, ceil_div, size, isPrime, getPrime, getStrongPrime, getRandomInteger, getRandomNBitInteger, getRandomRange
 from Crypto.Util.Padding import pad, unpad
+from Crypto.Util.strxor import strxor
 import hashlib
 from pwn import *
 from base64 import b64encode, b64decode
@@ -55,8 +56,11 @@ import traceback
 import os
 import json
 import zlib
+import subprocess
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+from collections import defaultdict
 
 flag_char_set = "_{}" + string.ascii_letters + string.digits + string.punctuation

@@ -8,6 +8,8 @@ class _custom_elliptic_curve_point:
 		return self._x
 	def y(self):
 		return self._y
+	def xy(self):
+		return (self._x, self._y)
 	def is_origin(self):
 		return self._x == None
 	def __eq__(self, other):
