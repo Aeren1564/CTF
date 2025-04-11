@@ -237,10 +237,10 @@ if __name__ == "__main__":
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_low_embedding_degree end\n")
 	for testcase in [
-		#test_conversion,
-		#test_singular,
-		#test_power,
-		#test_anomalous,
+		test_conversion,
+		test_singular,
+		test_power,
+		test_anomalous,
 		test_low_embedding_degree,
 	]:
 		testcase()
