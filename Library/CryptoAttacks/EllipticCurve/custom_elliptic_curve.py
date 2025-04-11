@@ -43,8 +43,8 @@ class _custom_elliptic_curve_point:
 	def __sub__(self, other):
 		assert isinstance(other, _custom_elliptic_curve_point)
 		return self + (-other)
-	def __mul__(self, m):
-		assert isinstance(m, int)
+	def __mul__(self, m: int):
+		m = int(m)
 		if m == 0:
 			return _custom_elliptic_curve_point(self.p, self.params, None, None)
 		if m < 0:

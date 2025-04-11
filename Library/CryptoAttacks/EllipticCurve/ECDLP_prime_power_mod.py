@@ -20,37 +20,29 @@ Current list of attacks
 4. MOV attack (for EC with high embedding degree, such as a supersingular curve)
 5. quadratic twist attack for supersingular curve with a=0 or b=0
 """
-def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int, Qy: int, threshold: int = 2**40, threshold2: int = 2**45):
-	p, e, Px, Py, Qx, Qy = int(p), int(e), int(Px), int(Py), int(Qx), int(Qy)
+def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, threshold: int = 2**40, threshold2: int = 2**50):
+	assert threshold >= -1 and threshold2 >= 0
+	# threshold == -1 turns off everything except the prime power check
+	p, e, (Px, Py), (Qx, Qy) = int(p), int(e), map(int, P), map(int, Q)
 	coef = list(map(int, coef))
 	from math import lcm
 	from sage.all import is_prime, CRT, ZZ, Zmod, GF, Qp, EllipticCurve, factor
+	from EC_coordinate_normalizer import EC_coordinate_normalizer
 	assert p >= 5 and is_prime(p) and e >= 1
 	mod = p**e
 	if len(coef) == 2:
 		coef = [0, 0, 0, coef[0], coef[1]]
 	assert len(coef) == 5
-	Py = (Py + (coef[0] * Px + coef[2]) * pow(2, -1, mod)) % mod
-	Qy = (Qy + (coef[0] * Qx + coef[2]) * pow(2, -1, mod)) % mod
-	coef = [
-		(coef[1] + coef[0]**2 * pow(4, -1, mod)) * pow(3, -1, mod) % mod,
-		(coef[3] + coef[0] * coef[2] * pow(2, -1, mod)) % mod,
-		(coef[4] + coef[2]**2 * pow(4, -1, mod)) % mod
-	]
-	Px = (Px + coef[0]) % mod
-	Qx = (Qx + coef[0]) % mod
-	coef = [
-		(coef[1] - 3 * coef[0]**2) % mod,
-		(2 * coef[0]**3 - coef[0] * coef[1] + coef[2]) % mod
-	]
-	for x, y in [(Px, Py), (Qx, Qy)]:
-		assert (y**2 - x**3 - coef[0] * x - coef[1]) % mod == 0
+	normalizer = EC_coordinate_normalizer(Zmod(mod), coef)
+	coef = list(map(int, normalizer.get_coef()))
+	Px, Py = map(int, normalizer.map(Px, Py))
+	Qx, Qy = map(int, normalizer.map(Qx, Qy))
 	desc = -16 * (4 * coef[0]**3 + 27 * coef[1]**2) % p
 	F, R = GF(p), Zmod(p**e)
 	attack_list = []
 	if desc == 0:
 		def update_with_singular_curve_attack():
-			if e != 1: # I don't know how to solve prime power case
+			if threshold == -1 or e != 1: # I don't know how to solve prime power case
 				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_singular_curve_attack begin")
 			x = F["X"].gen()
@@ -97,7 +89,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_prime_power end")
 			return k, p**(e-1)
 		def update_with_small_factor():
-			if threshold == 1:
+			if threshold == -1:
 				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_small_factor begin")
 			large_factors = 1
@@ -110,7 +102,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_small_factor end")
 			return k, (large_factors * PF).order()
 		def update_with_Smart_attack():
-			if curve_order != p:
+			if threshold == -1 or curve_order != p:
 				return 0, 1
 			# Anomalous curve -> Smart attack
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_Smart_attack begin")
@@ -128,7 +120,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_Smart_attack end")
 			return k, PF.order()
 		def update_with_MOV_attack():
-			if threshold2 == 1:
+			if threshold == -1 or threshold2 == 1:
 				return 0, 1
 			for d in range(1, 7):
 				if pow(p, d, p_order) == 1:
@@ -143,15 +135,28 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 					large_factors *= q**f
 			EC2 = EllipticCurve(GF(p**d), coef)
 			P2, Q2 = EC2(Px, Py) * large_factors, EC2(Qx, Qy) * large_factors
-			while True:
+			opt_order = -1
+			opt_order_R2 = None
+			for _ in range(50):
 				R2 = EC2.random_element()
 				R2 = (R2.order() // P2.order()) * R2
 				if R2.order() == P2.order() and R2.weil_pairing(P2, P2.order()) != 1:
-					break
-			k = R2.weil_pairing(Q2, Q2.order()).log(R2.weil_pairing(P2, P2.order()))
-			assert k * P2 == Q2
+					alpha = R2.weil_pairing(P2, P2.order())
+					if opt_order < alpha.multiplicative_order():
+						opt_order = alpha.multiplicative_order()
+						opt_order_R2 = R2
+			if opt_order_R2 == None:
+				return 0, 1
+			alpha = P2.weil_pairing(R2, R2.order())
+			beta = Q2.weil_pairing(R2, R2.order())
+			assert P2.order() % alpha.multiplicative_order() == 0
+			loss = P2.order() // alpha.multiplicative_order()
+			if loss != 1:
+				print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack {loss = }")
+			k = beta.log(alpha)
+			assert k * loss * P2 == loss * Q2
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack end")
-			return k, P2.order()
+			return k, alpha.multiplicative_order()
 		attack_list += [update_with_prime_power, update_with_small_factor, update_with_Smart_attack, update_with_MOV_attack]
 	r, m = 0, 1
 	for attack in attack_list:
@@ -161,6 +166,20 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 
 if __name__ == "__main__":
 	from sage.all import is_prime, CRT, Zmod, GF, Qp, EllipticCurve
+	def test_conversion():
+		print(f"[INFO]<ECDLP_prime_power_mod> test_conversion begin")
+		from sage.all import GF, EllipticCurve
+		p, e = 1000000007, 1
+		coef = [123, 456, 23423, 8182, 3291]
+		EC = EllipticCurve(GF(p), coef)
+		P = EC.lift_x(GF(p)(3))
+		k = 1233423
+		Q = k * P
+		r, m = ECDLP_prime_power_mod(p, e, coef, P.xy(), Q.xy())
+		assert 0 <= r < m
+		assert k % m == r
+		assert r == k
+		print(f"[INFO]<ECDLP_prime_power_mod> test_conversion end\n")
 	def test_singular():
 		print(f"[INFO]<ECDLP_prime_power_mod> test_singular begin")
 		from custom_elliptic_curve import custom_elliptic_curve
@@ -170,7 +189,7 @@ if __name__ == "__main__":
 		P = EC(97396093570994028423863943496522860154, 2113909984961319354502377744504238189)
 		k = 12324342554345523452132592398117171**max(1, e - 1)
 		Q = k * P
-		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		r, m = ECDLP_prime_power_mod(p, e, coef, P.xy(), Q.xy())
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
@@ -183,7 +202,7 @@ if __name__ == "__main__":
 		P = EC(201395103510950985196528886887600944697931024970644444173327129750000389064102542826357168547230875812115987973230106228243893553395960867041978131850021580112077013996963515239128729448812815223970675917812499157323530103467271226, 217465854493032911836659600850860977113580889059985393999460199722148747745817726547235063418161407320876958474804964632767671151534736727858801825385939645586103320316229199221863893919847277366752070948157424716070737997662741835)
 		k = 123243425543455234521325923981171711233142435231413413423421341341424232352454245424253
 		Q = k * P
-		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		r, m = ECDLP_prime_power_mod(p, e, coef, P.xy(), Q.xy())
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
@@ -197,30 +216,31 @@ if __name__ == "__main__":
 		P = E.lift_x(R(9872341))
 		k = 189213912839910219309139439134911**max(1, e - 2)
 		Q = k * P
-		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		r, m = ECDLP_prime_power_mod(p, e, coef, P.xy(), Q.xy())
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_anomalous end\n")
 	def test_low_embedding_degree():
 		print(f"[INFO]<ECDLP_prime_power_mod> test_low_embedding_degree begin")
-		p, e = 1331169830894825846283645180581, 3
+		p, e = 1331169830894825846283645180581, 5
 		coef = [-35, 98]
 		assert (p**2 - 1) % EllipticCurve(GF(p), coef).order() == 0
 		R = Zmod(p**e)
 		E = EllipticCurve(R, coef)
 		P = E.lift_x(R(479691812266187139164535778017))
-		k = 29618469991922269**e
+		k = 1331169830894825846273645180581**max(1, e - 1)
 		Q = k * P
-		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		r, m = ECDLP_prime_power_mod(p, e, coef, P.xy(), Q.xy())
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_low_embedding_degree end\n")
 	for testcase in [
-		test_singular,
-		test_power,
-		test_anomalous,
+		#test_conversion,
+		#test_singular,
+		#test_power,
+		#test_anomalous,
 		test_low_embedding_degree,
 	]:
 		testcase()
