@@ -1,5 +1,4 @@
 from CTF_Library import *
-from collections import defaultdict
 
 point = []
 with open("output.txt", "r") as out:
