@@ -1,1 +1,0 @@
-flag = "flagprefix{TEST_FLAG!!!z}"

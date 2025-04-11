@@ -2,6 +2,7 @@ class disjoint_set:
 	def __init__(self, n):
 		self.n = n
 		self.p = [-1] * self.n
+		self._group_count = n
 	def root(self, u):
 		if self.p[u] < 0:
 			return u
@@ -17,6 +18,15 @@ class disjoint_set:
 			u, v = v, u
 		self.p[u] += self.p[v]
 		self.p[v] = u
+		self._group_count -= 1
 		return True
 	def clear(self):
 		self.p = [-1] * self.n
+		self._group_count = self.n
+	def group_count(self):
+		return self._group_count
+	def group_up(self):
+		group = [[] for _ in range(self.n)]
+		for i in range(self.n):
+			group[self.root(i)].append(i)
+		return [g for g in group if len(g) > 0]

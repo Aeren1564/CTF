@@ -1,0 +1,7 @@
+# syntax=docker/dockerfile:1
+FROM --platform=linux/amd64 ubuntu:22.04
+
+WORKDIR /app
+COPY bin bin
+ENV LD_LIBRARY_PATH=/app/bin
+ENTRYPOINT ["./bin/hash"]

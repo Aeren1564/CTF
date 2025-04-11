@@ -100,7 +100,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			ECQp = ECR.change_ring(Qp(p))
 			PQp, QQp = ECQp(PR) * curve_order, ECQp(QR) * curve_order
 			k = int(F((QQp.x() / QQp.y()) / (PQp.x() / PQp.y())))
-			r, m, = update_ans(r, m, k, p**(e - 1))
+			r, m, = update_ans(r, m, k * pow(curve_order, -1, p**(e - 1)) % p**(e - 1), p**(e - 1))
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_prime_power end")
 			return r, m
 		def update_with_small_factor(r, m):
@@ -114,7 +114,8 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 					large_factors *= q**f
 			k = (large_factors * QF).log(large_factors * PF)
 			assert k * large_factors * PF == large_factors * QF
-			r, m = update_ans(r, m, k, (large_factors * PF).order())
+			larger_p_order = (large_factors * PF).order()
+			r, m = update_ans(r, m, k * pow(large_factors, -1, larger_p_order) % larger_p_order, larger_p_order)
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_small_factor end")
 			return r, m
 		def update_with_Smart_attack(r, m):
@@ -155,9 +156,9 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			while True:
 				R2 = EC2.random_element()
 				R2 = (R2.order() // P2.order()) * R2
-				if R2.order() == P2.order() and P2.weil_pairing(R2, R2.order()) != 1:
+				if R2.order() == P2.order() and R2.weil_pairing(P2, P2.order()) != 1:
 					break
-			k = Q2.weil_pairing(R2, R2.order()).log(P2.weil_pairing(R2, R2.order()))
+			k = R2.weil_pairing(Q2, Q2.order()).log(R2.weil_pairing(P2, P2.order()))
 			print(f"{k = }")
 			assert k * P2 == Q2
 			r, m = update_ans(r, m, k, P2.order())
@@ -185,6 +186,22 @@ if __name__ == "__main__":
 		assert k % m == r
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_singular end\n")
+	def test_power():
+		print(f"[INFO]<ECDLP_prime_power_mod> test_power begin")
+		p, e = 74894047922780452080480621188147614680859459381887703650502711169525598419741, 3
+		coef = [22457563127094032648529052905270083323161530718333104214029365341184039143821, 82792468191695528560800352263039950790995753333968972067250646020461455719312]
+		EC = EllipticCurve(Zmod(p**e), coef)
+		P = EC(201395103510950985196528886887600944697931024970644444173327129750000389064102542826357168547230875812115987973230106228243893553395960867041978131850021580112077013996963515239128729448812815223970675917812499157323530103467271226, 217465854493032911836659600850860977113580889059985393999460199722148747745817726547235063418161407320876958474804964632767671151534736727858801825385939645586103320316229199221863893919847277366752070948157424716070737997662741835)
+		k = 123243425543455234521325923981171711233142435231413413423421341341424232352454245424253
+		Q = k * P
+		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		print(f"{k = }")
+		print(f"{r = }")
+		print(f"{m = }")
+		assert 0 <= r < m
+		assert k % m == r
+		assert r == k
+		print(f"[INFO]<ECDLP_prime_power_mod> test_power end\n")
 	def test_anomalous():
 		print(f"[INFO]<ECDLP_prime_power_mod> test_anomalous begin")
 		p, e = 0xa15c4fb663a578d8b2496d3151a946119ee42695e18e13e90600192b1d0abdbb6f787f90c8d102ff88e284dd4526f5f6b6c980bf88f1d0490714b67e8a2a2b77, 1 # not sure how to deal with high e for anomalous curve
@@ -210,13 +227,17 @@ if __name__ == "__main__":
 		k = 29618469991922269**e
 		Q = k * P
 		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
+		print(f"{k = }")
+		print(f"{r = }")
+		print(f"{m = }")
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_low_embedding_degree end\n")
 	for testcase in [
+		test_power,
 		#test_singular,
 		#test_anomalous,
-		test_low_embedding_degree,
+		#test_low_embedding_degree,
 	]:
 		testcase()

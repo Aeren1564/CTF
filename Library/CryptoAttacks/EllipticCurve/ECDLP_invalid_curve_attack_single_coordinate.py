@@ -2,7 +2,7 @@
 # We're given an oracle which accepts the X-coordinate of a point P in E, and outputs the X-coordinate of s*P for some fixed secret integer s, but the oracle does not check that such point P exist for given coordinate
 # Note that all such point belongs to any of the curve Y^2 = X^3 + a*t^2*X + b*t^3 for non-square t, called the "twisted curve", and they're all of the same order
 # Returns a list of possible (s mod m) along with m which is the lcm of the order of the initial curve and the twisted curve
-def ECDLP_invalid_curve_attack_single_coordinate(q: int, a: int, b: int, multiply_by_secret, use_initial_curve = True):
+def ECDLP_invalid_curve_attack_single_coordinate(q: int, a: int, b: int, multiply_by_secret, use_initial_curve = True, threshold: int = 2**40):
 	import math
 	from sage.all import GF, EllipticCurve, factor, CRT, is_prime
 	F = GF(q)
@@ -11,10 +11,7 @@ def ECDLP_invalid_curve_attack_single_coordinate(q: int, a: int, b: int, multipl
 	def process_for_twist(t):
 		EC = EllipticCurve(F, [a * t**2, b * t**3])
 		print(f"[INFO]<ECDLP_invalid_curve_attack_single_coordinate> Curve with twist {t} is of order {EC.order()} with factorization {factor(EC.order())}")
-		if is_prime(EC.order()):
-			p = EC.gen(0)
-		else:
-			p = EC.gen(0) * math.prod(p for p, e in factor(EC.order()) if p > 2**40)
+		p = EC.gen(0) * math.prod(p for p, e in factor(EC.order()) if p >= threshold)
 		cand_sp = EC.lift_x(F(multiply_by_secret(p.x() / t)) * t)
 		rem = []
 		for sp in [cand_sp, -cand_sp]:

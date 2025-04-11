@@ -1,1 +1,0 @@
- a = 'p' ;b= 'rin' ; c = 't' ;d= '(open' ; e = '(' ;f= '"' ; g = 'f' ;h= 'l' ; i ="a";j="g"; k = '.' ;l= 't' ; m = 'x' ;n= 't' ; o = '").' ;p= 'r' ; q ="e";r="a"; s = 'd' ;t= '(' ; u =")";v=")"; eval	(a +b+ c +d+ e +f+ g +h+ i +j+ k +l+ m +n+ o +p+ q +r+ s +t+ u +v+ w )

@@ -1,1 +1,0 @@
-flag = "TEST_FLAG{ASDFSDZ??!@!}"

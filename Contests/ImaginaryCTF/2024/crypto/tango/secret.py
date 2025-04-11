@@ -1,0 +1,1 @@
+FLAG="ictf{TEST_FLAG}"

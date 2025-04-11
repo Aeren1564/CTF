@@ -1,9 +1,0 @@
-services:
-
-  fluxkeyaccess:
-    build: .
-    env_file:
-      - flag.env
-    ports:
-      - "1337:1337"
-    restart: unless-stopped

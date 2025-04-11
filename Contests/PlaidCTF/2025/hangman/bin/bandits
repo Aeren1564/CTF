@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+
+import sys
+
+if len(sys.argv) != 2:
+	print(f"Usage: python3 {sys.argv[0]} <dictionary_path>", file=sys.stderr)
+	sys.exit(1)
+
+from random import shuffle
+from string import ascii_lowercase
+
+# This is a sample; the actual bandits will be different.
+while True:
+	order = list(ascii_lowercase)
+	shuffle(order)
+	i = 0
+	while True:
+		state = input()
+		if state == "RESET":
+			break
+		else:
+			print(order[i])
+			i += 1

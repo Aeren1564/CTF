@@ -1,0 +1,17 @@
+services:
+  level1:
+    image: hangman/level1
+    build:
+      context: .
+      dockerfile: Dockerfile.hangman1
+    ports:
+      - "6001:6666"
+    restart: always
+  level2:
+    image: hangman/level2
+    build:
+      context: .
+      dockerfile: Dockerfile.hangman2
+    ports:
+      - "6002:6666"
+    restart: always

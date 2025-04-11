@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1
+FROM --platform=linux/amd64 python:3.12-slim
+
+RUN apt update && apt install -y lib32z1 xinetd
+RUN useradd -m hangman
+COPY xinetd.conf /etc/xinetd.d/hangman
+
+WORKDIR /app
+COPY dictionary.txt .
+COPY flag1.txt /flag.txt
+COPY bin/hangman1 hangman
+COPY bin/libhash.so libhash.so
+COPY bin/bandits bandits
+ENV LD_LIBRARY_PATH=/app
+
+CMD ["/usr/sbin/xinetd", "-dontfork"]
