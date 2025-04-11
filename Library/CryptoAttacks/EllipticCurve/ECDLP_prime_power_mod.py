@@ -46,17 +46,12 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 	for x, y in [(Px, Py), (Qx, Qy)]:
 		assert (y**2 - x**3 - coef[0] * x - coef[1]) % mod == 0
 	desc = -16 * (4 * coef[0]**3 + 27 * coef[1]**2) % p
-	r, m = 0, 1
-	def update_ans(r, m, rr, mm):
-		rr, mm = int(rr), int(mm)
-		r = CRT([r, rr], [m, mm])
-		m = lcm(m, mm)
-		return r, m
 	F, R = GF(p), Zmod(p**e)
+	attack_list = []
 	if desc == 0:
-		def update_with_singular_curve_attack(r, m):
+		def update_with_singular_curve_attack():
 			if e != 1: # I don't know how to solve prime power case
-				return r, m
+				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_singular_curve_attack begin")
 			x = F["X"].gen()
 			f = x**3 + coef[0]*x + coef[1]
@@ -65,7 +60,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 				alpha = roots[0][0]
 				u = (Px - alpha) / Py
 				v = (Qx - alpha) / Qy
-				r, m = update_ans(r, m, F(v / u), p)
+				return int(F(v / u)), p
 			elif len(roots) == 2:
 				if roots[0][1] == 2:
 					alpha = roots[0][0]
@@ -78,12 +73,11 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 				t = (alpha - beta).sqrt()
 				u = (Py + t * (Px - alpha)) / (Py - t * (Px - alpha))
 				v = (Qy + t * (Qx - alpha)) / (Qy - t * (Qx - alpha))
-				r, m = update_ans(r, m, v.log(u), p**2)
+				return v.log(u), p**2
 			else:
 				assert False
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_singular_curve_attack end")
-			return r, m
-		r, m = update_with_singular_curve_attack(r, m)
+		attack_list += [update_with_singular_curve_attack]
 	else:
 		ECF = EllipticCurve(F, coef)
 		ECR = EllipticCurve(R, coef)
@@ -91,21 +85,20 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 		p_order = PF.order()
 		curve_order = ECF.order()
 		assert QF.weil_pairing(PF, p_order) == 1, "[ERROR]<ECDLP_prime_power_mod>, P and Q must be linearly dependent"
-		def update_with_prime_power(r, m):
+		def update_with_prime_power():
 			if e == 1 or curve_order % p == 0:
-				return r, m
+				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_prime_power begin")
 			# EC(Zmod(p**e)) ~ EC(GF(p)) x Zmod(p**(e-1))
 			# Deal with Zmod(p**(e-1)) part with EC(Qp(p))
 			ECQp = ECR.change_ring(Qp(p))
 			PQp, QQp = ECQp(PR) * curve_order, ECQp(QR) * curve_order
-			k = int(F((QQp.x() / QQp.y()) / (PQp.x() / PQp.y())))
-			r, m, = update_ans(r, m, k * pow(curve_order, -1, p**(e - 1)) % p**(e - 1), p**(e - 1))
+			k = int(Zmod(p**(e-1))((QQp.x() / QQp.y()) / (PQp.x() / PQp.y())))
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_prime_power end")
-			return r, m
-		def update_with_small_factor(r, m):
+			return k, p**(e-1)
+		def update_with_small_factor():
 			if threshold == 1:
-				return r, m
+				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_small_factor begin")
 			large_factors = 1
 			for q, f in factor(p_order):
@@ -114,13 +107,11 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 					large_factors *= q**f
 			k = (large_factors * QF).log(large_factors * PF)
 			assert k * large_factors * PF == large_factors * QF
-			larger_p_order = (large_factors * PF).order()
-			r, m = update_ans(r, m, k * pow(large_factors, -1, larger_p_order) % larger_p_order, larger_p_order)
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_small_factor end")
-			return r, m
-		def update_with_Smart_attack(r, m):
+			return k, (large_factors * PF).order()
+		def update_with_Smart_attack():
 			if curve_order != p:
-				return r, m
+				return 0, 1
 			# Anomalous curve -> Smart attack
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_Smart_attack begin")
 			import random
@@ -134,17 +125,16 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 			PQp, QQp = PQp * p, QQp * p
 			k = int(F((QQp.x() / QQp.y()) / (PQp.x() / PQp.y())))
 			assert k * PF == QF
-			r, m = update_ans(r, m, k, PF.order())
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_Smart_attack end")
-			return r, m
-		def update_with_MOV_attack(r, m):
+			return k, PF.order()
+		def update_with_MOV_attack():
 			if threshold2 == 1:
-				return r, m
+				return 0, 1
 			for d in range(1, 7):
 				if pow(p, d, p_order) == 1:
 					break
 			else:
-				return r, m
+				return 0, 1
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack begin with embedding degree {d}")
 			large_factors = 1
 			for q, f in list(factor(p - 1)) + list(factor((p**d - 1) / (p - 1))):
@@ -159,15 +149,14 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, Px: int, Py: int, Qx: int,
 				if R2.order() == P2.order() and R2.weil_pairing(P2, P2.order()) != 1:
 					break
 			k = R2.weil_pairing(Q2, Q2.order()).log(R2.weil_pairing(P2, P2.order()))
-			print(f"{k = }")
 			assert k * P2 == Q2
-			r, m = update_ans(r, m, k, P2.order())
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack end")
-			return r, m
-		r, m = update_with_prime_power(r, m)
-		r, m = update_with_small_factor(r, m)
-		r, m = update_with_Smart_attack(r, m)
-		r, m = update_with_MOV_attack(r, m)
+			return k, P2.order()
+		attack_list += [update_with_prime_power, update_with_small_factor, update_with_Smart_attack, update_with_MOV_attack]
+	r, m = 0, 1
+	for attack in attack_list:
+		rr, mm = attack()
+		r, m = CRT([r, rr], [m, mm]), lcm(m, mm)
 	return int(r), int(m)
 
 if __name__ == "__main__":
@@ -195,9 +184,6 @@ if __name__ == "__main__":
 		k = 123243425543455234521325923981171711233142435231413413423421341341424232352454245424253
 		Q = k * P
 		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
-		print(f"{k = }")
-		print(f"{r = }")
-		print(f"{m = }")
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
@@ -227,17 +213,14 @@ if __name__ == "__main__":
 		k = 29618469991922269**e
 		Q = k * P
 		r, m = ECDLP_prime_power_mod(p, e, coef, *P.xy(), *Q.xy())
-		print(f"{k = }")
-		print(f"{r = }")
-		print(f"{m = }")
 		assert 0 <= r < m
 		assert k % m == r
 		assert r == k
 		print(f"[INFO]<ECDLP_prime_power_mod> test_low_embedding_degree end\n")
 	for testcase in [
+		test_singular,
 		test_power,
-		#test_singular,
-		#test_anomalous,
-		#test_low_embedding_degree,
+		test_anomalous,
+		test_low_embedding_degree,
 	]:
 		testcase()
