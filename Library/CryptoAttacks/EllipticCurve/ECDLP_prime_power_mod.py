@@ -22,9 +22,10 @@ Current list of attacks
 """
 def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, threshold: int = 2**40, threshold2: int = 2**50):
 	assert threshold >= -1 and threshold2 >= 0
-	# threshold == -1 turns off everything except the prime power check
+	# threshold == -1 turns off everything except for the prime power check
 	p, e, (Px, Py), (Qx, Qy) = int(p), int(e), map(int, P), map(int, Q)
 	coef = list(map(int, coef))
+	import time
 	from math import lcm
 	from sage.all import is_prime, CRT, ZZ, Zmod, GF, Qp, EllipticCurve, factor
 	from EC_coordinate_normalizer import EC_coordinate_normalizer
@@ -120,7 +121,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, thresh
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_Smart_attack end")
 			return k, PF.order()
 		def update_with_MOV_attack():
-			if threshold == -1 or threshold2 == 1:
+			if threshold == -1:
 				return 0, 1
 			for d in range(1, 7):
 				if pow(p, d, p_order) == 1:
@@ -137,7 +138,7 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, thresh
 			P2, Q2 = EC2(Px, Py) * large_factors, EC2(Qx, Qy) * large_factors
 			opt_order = -1
 			opt_order_R2 = None
-			for _ in range(50):
+			for _ in range(100):
 				R2 = EC2.random_element()
 				R2 = (R2.order() // P2.order()) * R2
 				if R2.order() == P2.order() and R2.weil_pairing(P2, P2.order()) != 1:
@@ -147,13 +148,14 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, thresh
 						opt_order_R2 = R2
 			if opt_order_R2 == None:
 				return 0, 1
-			alpha = P2.weil_pairing(R2, R2.order())
-			beta = Q2.weil_pairing(R2, R2.order())
+			alpha = P2.weil_pairing(opt_order_R2, opt_order_R2.order())
+			beta = Q2.weil_pairing(opt_order_R2, opt_order_R2.order())
 			assert P2.order() % alpha.multiplicative_order() == 0
 			loss = P2.order() // alpha.multiplicative_order()
-			if loss != 1:
-				print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack {loss = }")
+			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack {loss = }")
+			start_time = time.time()
 			k = beta.log(alpha)
+			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack discrete log took {time.time() - start_time} seconds")
 			assert k * loss * P2 == loss * Q2
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_MOV_attack end")
 			return k, alpha.multiplicative_order()

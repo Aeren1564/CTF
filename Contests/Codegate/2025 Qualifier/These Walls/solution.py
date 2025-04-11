@@ -32,9 +32,7 @@ def recover_param():
 mod, a, b = recover_param()
 assert not is_prime(mod)
 
-singular_factors = [
-	3562548874780288796769030192977
-]
+singular_factor = 3562548874780288796769030192977
 
 non_singular_factors = [
 	(324094280281900209908870811008292068290746348301400744740589987, 2),
@@ -52,33 +50,32 @@ def list_bitand(a, b):
 	return c
 
 print(f"[Processing singular curves]")
-for p in singular_factors:
+while True:
+	guess = random.randrange(32 * 8 - 1)
+	p = singular_factor
 	print(f"{p = }")
 	assert mod % p == 0 and is_prime(p)
-	EC = custom_elliptic_curve(p, [a, b])
-	s = 1688818121111580066310934554129
-	cur = [1] * (32 * 8)
-	for j in range(1, 32 * 8):
-		if s * EC(*point[j - 1]) != EC(*point[j]):
-			cur[j] = 0
-	assert sum(cur) >= 32 * 3
+	cur = [1] + ECDDHP_prime_power_mod(p, 1, [a, b], point[guess], point[guess + 1], [(point[i], point[i + 1]) for i in range(32 * 8 - 1)])
+	print(f"{cur = }")
+	if sum(cur) < 3 * 32:
+		continue
 	list_key = list_bitand(list_key, cur)
+	break
 print("[End]\n")
 
 print(f"[Processing non-singular curves]")
 for p, e in non_singular_factors:
 	while True:
-		i = random.randrange(1, 32 * 8)
-		if list_key[i] == 0:
+		guess = random.randrange(32 * 8 - 1)
+		if not list_key[guess]:
 			continue
-		print(f"Trying {i = }")
-		cur = [1] + [(1 if ECDDHP_prime_power_mod(p, e, [a, b], *point[i - 1], *point[i], *point[j - 1], *point[j]) else 0) for j in range(1, 32 * 8)]
+		cur = [1] + ECDDHP_prime_power_mod(p, e, [a, b], point[guess], point[guess + 1], [(point[i], point[i + 1]) for i in range(32 * 8 - 1)])
+		print(f"{cur = }")
 		if sum(cur) < 32 * 3:
 			continue
-		print(f"{cur = }")
 		list_key = list_bitand(list_key, cur)
+		print()
 		break
-	print()
 print("[End]\n")
 
 print(f"{list_key = }")

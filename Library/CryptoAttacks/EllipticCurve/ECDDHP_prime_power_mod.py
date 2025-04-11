@@ -65,17 +65,20 @@ def ECDDHP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, targe
 				root = F2(-1).nth_root(2)
 				def distortion_map(P):
 					return ECF2(-P.x(), root * P.y())
+			if e >= 2:
+				r0, m0 = ECDLP_prime_power_mod(p, e, coef, (Px, Py), (Qx, Qy), -1, 0)
 			for R, S in targets:
 				RF, SF = ECF(*R), ECF(*S)
 				if ECF2(PF).weil_pairing(distortion_map(SF), p + 1) != ECF2(QF).weil_pairing(distortion_map(RF), p + 1):
 					res.append(0)
+				elif e == 1:
+					res.append(1)
 				else:
-					r0, m0 = ECDLP_prime_power_mod(p, e, coef, (Px, Py), (Qx, Qy), -1, 0)
 					r1, m1 = ECDLP_prime_power_mod(p, e, coef, R, S, -1, 0)
 					res.append(1 if r0 == r1 else 0)
 			print(f"[INFO]<ECDDHP_prime_power_mod> updating with quadratic twist end")
 		else:
-			print(f"[INFO]<ECDDHP_prime_power_mod> explicit k computation begin")
+			print(f"[INFO]<ECDDHP_prime_power_mod> explicit computation begin")
 			res = [None for _ in targets]
 			for i, (R, S) in enumerate(targets):
 				RF, SF = ECF(*R), ECF(*S)
@@ -86,7 +89,7 @@ def ECDDHP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, targe
 				for i, (R, S) in enumerate(targets):
 					if res[i] == None:
 						res[i] = (1 if k * ECR(*R) == ECR(*S) else 0)
-			print(f"[INFO]<ECDDHP_prime_power_mod> explicit k computation end")
+			print(f"[INFO]<ECDDHP_prime_power_mod> explicit computation end")
 		return res
 
 if __name__ == "__main__":
