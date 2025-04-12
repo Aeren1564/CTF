@@ -16,6 +16,8 @@ This function attempts to check if k*R = S for each pair (R, S) in targets
 If it returns 0, the real answer is false
 If it returns 1, the real answer is true
 Otherwise, the answer could be both
+
+Returns None if P and Q are linearly independent
 """
 def ECDDHP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, targets: list, threshold: int = 2**40, threshold2: int = 2**50):
 	p, e, (Px, Py), (Qx, Qy) = int(p), int(e), map(int, P), map(int, Q)
@@ -49,7 +51,9 @@ def ECDDHP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, targe
 		F = GF(p)
 		ECF, ECR = EllipticCurve(F, coef), EllipticCurve(Zmod(p**e), coef)
 		PF, QF = ECF(Px, Py), ECF(Qx, Qy)
-		assert QF.weil_pairing(PF, PF.order()) == 1, "[ERROR]<ECDDHP_prime_power_mod>, P and Q must be linearly dependent"
+		if QF.weil_pairing(PF, PF.order()) != 1:
+			print(f"[WARNING]<ECDDHP_prime_power_mod>, P and Q must be linearly dependent")
+			return None
 		res = []
 		if ECF.order() == p + 1 and (coef[0] % p == 0 or coef[1] % p == 0):
 			print(f"[INFO]<ECDDHP_prime_power_mod> updating with quadratic twist begin")

@@ -13,6 +13,8 @@ Let P = (Px, Py) and Q = (Qx, Qy) be points on E such that k*P=Q for some intege
 
 This function attempts to find a pair of integers (r, m) such that k = r mod m, and m is as large as possible, by iterating over all attacks on vulnerable curve known to me
 
+Returns (None, None) if P and Q are linearly independent
+
 Current list of attacks
 1. singular curve attack (for e=1)
 2. Prime power curve attack (using EC(Zmod(p**e)) ~ EC(GF(p)) x Zmod(p**(e-1)))
@@ -77,7 +79,9 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, thresh
 		PF, QF, PR, QR = ECF(Px, Py), ECF(Qx, Qy), ECR(Px, Py), ECR(Qx, Qy)
 		p_order = PF.order()
 		curve_order = ECF.order()
-		assert QF.weil_pairing(PF, p_order) == 1, "[ERROR]<ECDLP_prime_power_mod>, P and Q must be linearly dependent"
+		if QF.weil_pairing(PF, p_order) != 1:
+			print(f"[WARNING]<ECDLP_prime_power_mod>, P and Q must be linearly dependent")
+			return None, None
 		def update_with_prime_power():
 			if e == 1 or curve_order % p == 0:
 				return 0, 1

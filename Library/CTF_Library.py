@@ -64,4 +64,4 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from collections import defaultdict
 
-flag_char_set = "_{}" + string.ascii_letters + string.digits + string.punctuation
+flag_char_set = "_{}:" + string.ascii_letters + string.digits + string.punctuation
