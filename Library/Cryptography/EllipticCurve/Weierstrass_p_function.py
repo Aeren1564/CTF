@@ -2,6 +2,7 @@
 # - https://gist.github.com/stla/d771e0a8c351d16d186c79bc838b6c48
 # - https://math.stackexchange.com/questions/2644640/
 # Used in the homomorphism C/lambda -> EC: z -> (wp(z) : wp'(z) : 1) between a complex torus and an elliptic curve
+# EC is given by the equation Y^2 = 4*X^3 - g2*X - g3
 def generate_weierstrass_p_from_g2_and_g3(g2, g3, precision: int = 200, derivative: int = 0):
 	import mpmath
 	mpmath.mp.dps = precision
