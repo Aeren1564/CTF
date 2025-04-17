@@ -68,7 +68,13 @@ def ECDLP_prime_power_mod(p: int, e: int, coef: list, P: tuple, Q: tuple, thresh
 				t = (alpha - beta).sqrt()
 				u = (Py + t * (Px - alpha)) / (Py - t * (Px - alpha))
 				v = (Qy + t * (Qx - alpha)) / (Qy - t * (Qx - alpha))
-				return v.log(u), p**2
+				u_order = u.multiplicative_order()
+				large_factors = 1
+				for q, f in factor(u_order):
+					if q >= threshold2:
+						print(f"[INFO]<ECDLP_prime_power_mod> update_with_singular_curve_attack ignoring factor {q}^{f}")
+						large_factors *= q**f
+				return (v**large_factors).log(u**large_factors), u_order // large_factors
 			else:
 				assert False
 			print(f"[INFO]<ECDLP_prime_power_mod> update_with_singular_curve_attack end")
