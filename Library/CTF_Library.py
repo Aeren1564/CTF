@@ -34,6 +34,7 @@ from sage.all import *
 from sage.rings.factorint import factor_trial_division
 proof.all(False)
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
 from Crypto.Util.number import bytes_to_long, long_to_bytes, inverse, ceil_div, size, isPrime, getPrime, getStrongPrime, getRandomInteger, getRandomNBitInteger, getRandomRange
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Util.strxor import strxor
@@ -46,6 +47,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from gmpy2 import isqrt, iroot
 from ast import literal_eval
 from copy import deepcopy
+from fractions import Fraction
 import string
 import numpy
 import itertools

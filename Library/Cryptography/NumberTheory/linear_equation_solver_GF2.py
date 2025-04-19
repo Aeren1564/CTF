@@ -46,6 +46,7 @@ class _bit_vector:
 		return self
 	def __getitem__(self, i):
 		return (self.data[i], self.flip[i])
+
 def make_bit_vectors(ns: list):
 	bvs = []
 	offset = 0
@@ -54,6 +55,7 @@ def make_bit_vectors(ns: list):
 		bvs.append(_bit_vector([1 << i for i in range(offset, offset + n)], [0] * n))
 		offset += n
 	return bvs
+
 class linear_equation_solver_GF2:
 	def __init__(self, n : int):
 		assert 0 <= n
@@ -105,7 +107,6 @@ class linear_equation_solver_GF2:
 			assert (eq & assignment).bit_count() % 2 == output
 			assert all((eq & b).bit_count() % 2 == 0 for b in basis)
 		return [assignment, basis]
-
 """
 Tested on
 - idekCTF2024/crypto/Seedy

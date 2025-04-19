@@ -53,12 +53,15 @@ def generate_strong_pseudoprime_2(bases: list, min_bit_length: int):
 
 # Source: https://github.com/jvdsn/crypto-attacks/blob/master/attacks/pseudoprimes/miller_rabin.py
 # Based on "Constructing Carmichael Numbers which are Strong Pseudoprimes to Several Bases" by François Arnault
-# Returns a tuple containing the pseudoprime n = p_1 * p_2 * p_3 along with its factors
-def generate_strong_pseudoprime_3(bases: list, min_bit_length: int):
+# Returns a list of tuples of length count containing the pseudoprime n = p_1 * p_2 * p_3 along with its factors
+def generate_strong_pseudoprime_3(bases: list, min_bit_length: int, count : int, is_valid : None):
 	from sage.all import is_prime, next_prime, kronecker, CRT
 	from math import gcd, lcm
 	assert len(bases) > 0 and all(is_prime(p) for p in bases)
 	assert min_bit_length >= 0
+	assert count > 0
+	if is_valid is None:
+		is_valid = lambda x, p1, p2, p3: True
 	def _generate_s(A, k):
 		S = []
 		for a in A:
@@ -98,12 +101,14 @@ def generate_strong_pseudoprime_3(bases: list, min_bit_length: int):
 		z, m = _backtrack(S, A, X, M, 0)
 		if z and m:
 			i = (2**(min_bit_length // 3)) // m
-			while True:
+			res = []
+			while len(res) < count:
 				p1 = int(z + i * m)
 				p2 = k2 * (p1 - 1) + 1
 				p3 = k3 * (p1 - 1) + 1
-				if is_prime(p1) and is_prime(p2) and is_prime(p3):
-					return p1 * p2 * p3, p1, p2, p3
+				if is_prime(p1) and is_prime(p2) and is_prime(p3) and is_valid(p1 * p2 * p3, p1, p2, p3):
+					res.append((p1 * p2 * p3, p1, p2, p3))
 				i += 1
+			return res
 		else:
 			k3 = int(next_prime(k3))

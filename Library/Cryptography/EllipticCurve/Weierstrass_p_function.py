@@ -81,6 +81,18 @@ def generate_weierstrass_p_from_w1_and_w2(w1, w2, precision: int = 200, derivati
 	return generate_weierstrass_p_from_g2_and_g3(g2, g3, precision, derivative)
 def generate_weierstrass_p_from_tau(tau, precision: int = 200, derivative: int = 0):
 	return generate_weierstrass_p_from_w1_and_w2(1.0, tau, precision, derivative)
+# Compute two periods of weierstrass p function corresponding to the elliptic curve Y^2 = X^3 + aX + b
+def generate_weierstrass_p_from_elliptic_curve(a, b, precision: int = 200, derivative: int = 0):
+	return generate_weierstrass_p_from_g2_and_g3(-4 * a, -16 * b, precision, derivative)
+def compute_fundamental_periods_from_elliptic_curve(a, b, precision: int = 200):
+	g2, g3 = -4 * a, -16 * b
+	import mpmath
+	mpmath.mp.dps = precision
+	from mpmath import polyroots, sqrt, ellipk
+	r3, r2, r1 = polyroots([4, 0, -g2, -g3])
+	print(f"{r1 = }, {r2 = }, {r3 = }")
+	k2 = (r2 - r3) / (r1 - r3)
+	return ellipk(k2) / sqrt(r1 - r3), 1j * ellipk(1 - k2) / sqrt(r1 - r3)
 
 if __name__ == "__main__":
 	eps = pow(10, -5)
