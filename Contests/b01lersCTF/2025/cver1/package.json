@@ -1,0 +1,19 @@
+{
+  "name": "cver1",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "enigcryptist",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "config": {
+    "port": 20035
+  },
+  "dependencies": {
+    "body-parser": "latest",
+    "circom2": "latest",
+    "circomlib": "^2.0.5",
+    "express": "latest",
+    "snarkjs": "0.7.5"
+  }
+}

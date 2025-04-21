@@ -1,6 +1,6 @@
 # Based on https://mathoverflow.net/questions/249872/generating-dataset-of-strong-pseudoprimes
 # Returns a tuple containing the pseudoprime n = p_1 * p_2 along with its factors
-def generate_strong_pseudoprime_2(bases: list, min_bit_length: int):
+def generate_strong_pseudoprime_2(bases: list, min_bit_length: int, count : int, check):
 	from sage.all import Zmod, is_prime, CRT
 	import os
 	from math import lcm
@@ -46,10 +46,12 @@ def generate_strong_pseudoprime_2(bases: list, min_bit_length: int):
 	mod = lcm(*mod)
 	p = 2**(min_bit_length // 2) // mod * mod + rem
 	q = 2 * p + 1
-	while True:
+	res = []
+	while len(res) < count:
 		p, q = p + mod, q + 2 * mod
-		if all(miller(p * q, b) if b in (3, 5) else miller_light(p, q, b) for b in map(Zmod(p * q), reversed(bases))):
-			return p * q, p, q
+		if all(miller(p * q, b) if b in (3, 5) else miller_light(p, q, b) for b in map(Zmod(p * q), reversed(bases))) and check(p * q, p, q):
+			res.append((p * q, p, q))
+	return res
 
 # Source: https://github.com/jvdsn/crypto-attacks/blob/master/attacks/pseudoprimes/miller_rabin.py
 # Based on "Constructing Carmichael Numbers which are Strong Pseudoprimes to Several Bases" by François Arnault
