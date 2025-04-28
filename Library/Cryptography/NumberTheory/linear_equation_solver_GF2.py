@@ -15,11 +15,21 @@ class _bit_vector:
 		if x == 0:
 			return _bit_vector(self.data, self.flip)
 		return _bit_vector([0] * x + self.data[:-x], [0] * x + self.flip[:-x])
+	def rotl(self, x):
+		assert 0 <= x <= self.n
+		if x == 0:
+			return _bit_vector(self.data, self.flip)
+		return _bit_vector(self.data[-x:] + self.data[:-x], self.flip[-x:] + self.flip[:-x])
 	def __rshift__(self, x):
 		assert 0 <= x <= self.n
 		if x == 0:
 			return _bit_vector(self.data, self.flip)
 		return _bit_vector(self.data[x:] + [0] * x, self.flip[x:] + [0] * x)
+	def rotr(self, x):
+		assert 0 <= x <= self.n
+		if x == 0:
+			return _bit_vector(self.data, self.flip)
+		return _bit_vector(self.data[x:] + self.data[:x], self.flip[x:] + self.flip[:x])
 	def __xor__(self, x):
 		assert isinstance(x, (int, _bit_vector))
 		if isinstance(x, int):
@@ -34,12 +44,20 @@ class _bit_vector:
 	def __invert__(self):
 		return _bit_vector(self.data, [1 - self.flip[i] for i in range(self.n)])
 	def __ilshift__(self, x):
-		assert 0 <= x <= len(data)
+		assert 0 <= x <= n
 		self = self << x
 		return self
+	def inplace_rotl(self, x):
+		assert 0 <= x <= n
+		self = self.rotl(x)
+		return self
 	def __irshift__(self, x):
-		assert 0 <= x <= len(data)
+		assert 0 <= x <= n
 		self = self >> x
+		return self
+	def inplace_rotr(self, x):
+		assert 0 <= x <= n
+		self = self.rotr(x)
 		return self
 	def __ixor__(self, other):
 		self = self ^ other

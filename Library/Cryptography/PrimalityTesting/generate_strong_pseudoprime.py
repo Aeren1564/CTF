@@ -55,8 +55,8 @@ def generate_strong_pseudoprime_2(bases: list, min_bit_length: int, count : int,
 
 # Source: https://github.com/jvdsn/crypto-attacks/blob/master/attacks/pseudoprimes/miller_rabin.py
 # Based on "Constructing Carmichael Numbers which are Strong Pseudoprimes to Several Bases" by François Arnault
-# Returns a list of tuples of length count containing the pseudoprime n = p_1 * p_2 * p_3 along with its factors
-def generate_strong_pseudoprime_3(bases: list, min_bit_length: int, count : int, is_valid : None):
+# Returns a list of tuples of length 'count' containing the pseudoprime n = p_1 * p_2 * p_3 along with its factors
+def generate_strong_pseudoprime_3(bases: list, min_bit_length: int, count : int, is_valid: None):
 	from sage.all import is_prime, next_prime, kronecker, CRT
 	from math import gcd, lcm
 	assert len(bases) > 0 and all(is_prime(p) for p in bases)

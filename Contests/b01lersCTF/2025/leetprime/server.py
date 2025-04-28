@@ -10,7 +10,7 @@ def proof_of_work():
 		if int(sha256(prefix + ans).hexdigest(), 16) & (0xFFFFFF << 232) == 0:
 			break
 
-#proof_of_work()
+proof_of_work()
 
 with open("flag.txt", "r") as f:
 	flag = f.read()
