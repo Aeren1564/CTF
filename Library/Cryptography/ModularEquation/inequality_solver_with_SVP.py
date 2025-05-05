@@ -74,10 +74,13 @@ class inequality_solver_with_SVP:
 		for row in mat:
 			if not 0 <= row[-1] <= 1:
 				continue
-			if print_lattice:
-				print(f"[INFO] {row = }")
 			assigned_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n)]
 			equation_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n, n + m)]
+			if print_lattice:
+				print(f"[INFO] <inequality_solver_with_SVP>")
+				print(f"{row[-1] = }")
+				print(f"{assigned_value = }")
+				print(f"{equation_value = }")
 			if any(not self.var_low[i] <= assigned_value[i] <= self.var_high[i] for i in range(n)):
 				continue
 			if any(not self.lows[i] <= equation_value[i] <= self.highs[i] for i in range(m)):
