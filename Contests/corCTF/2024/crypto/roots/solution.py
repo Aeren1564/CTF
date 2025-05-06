@@ -1,42 +1,41 @@
 from CTF_Library import *
-from decimal import Decimal, getcontext
-from Crypto.Util.number import getPrime, bytes_to_long
-from output import ct
 
-assert len(ct) == 4
+Decimal = RealField(6072)
+with open("output.txt") as file:
+	output = eval(file.read())
+
+k = 2**6000
+
+solver = inequality_solver_with_SVP([-2**200] * 4, [2**200] * 4)
+solver.add_inequality([int(k * output[i]) for i in range(4)], -2**300, 2**300)
+coef = solver.solve()[0][0]
+
+solver = inequality_solver_with_SVP([0] * 4, [2**64 - 1] * 4)
+solver.add_equality(coef, 0)
+res_a = vector(ZZ, solver.solve()[0][0])
+basis = matrix(ZZ, coef).right_kernel(basis = "LLL").basis_matrix()
+
+res = []
+for multiplier in itertools.product(range(-4, 5), repeat = 3):
+	cur = res_a + sum(multiplier[i] * basis[i] for i in range(3))
+	if 0 <= min(list(cur)) and max(list(cur)) < 2**64:
+		assert vector(ZZ, coef) * cur == 0
+		res.append(cur)
+
+for a in res:
+	for b in res:
+		for c in res:
+			flag = b"".join(long_to_bytes(x ^ y ^ z) for x, y, z in zip(a, b, c))
+			if flag.startswith(b"corctf{"):
+				print(flag)
+				exit(0)
 
 """
-ai, bi, ci in [0, 2**64]
-concatenate a0 xor b0 xor c0, a1 xor b1 xor c1, a2 xor b2 xor c2, a3 xor b3 xor c3 to recover flag
-ct0 = a0 * sqrt(p) + b0 * sqrt(q) + c0 * sqrt(r)
-ct1 = a1 * sqrt(p) + b1 * sqrt(q) + c1 * sqrt(r)
-ct2 = a2 * sqrt(p) + b2 * sqrt(q) + c2 * sqrt(r)
-ct3 = a3 * sqrt(p) + b3 * sqrt(q) + c3 * sqrt(r)
+p < q < r: 128-bit primes
+
+a, b, c: list of 64-bit integers
+0 <= i < 4
+a[i] * sqrt(p) + b[i] * sqrt(q) + c[i] * sqrt(r) = output[i]
+
+sum(coef[i] * k * output[i]) = 0
 """
-
-shift = 2**2024
-ct_shifted = [int(x * shift) for x in ct]
-mat = matrix(ZZ, 0, 5)
-for i in range(4):
-	mat = mat.stack(vector(ZZ, [0] * i + [1] + [0] * (3 - i) + [ct_shifted[i]]))
-
-bound = 2**900
-lowerbound = [0, 0, 0, 0, 0]
-upperbound = [bound, bound, bound, bound, 0]
-
-coef = solve_inequality_with_CVP(mat, lowerbound, upperbound)[ : -1]
-
-print(f"{coef = }")
-
-a = []
-for i in range(3):
-	# coef0 * a0 + coef1 * a1 + coef2 * a2 + coef3 * a3 = 0
-	mat = matrix(ZZ, 0, 5)
-	for j in range(4):
-		mat = mat.stack(vector(ZZ, [0] * i + [1] + [0] * (3 - i) + [coef[i]]))
-
-	lowerbound = [0, 0, 0, 0, 0]
-	upperbound = [2**64, 2**64, 2**64, 2**64, 0]
-
-	a.append(solve_inequality_with_CVP(mat, lowerbound, upperbound)[: -1])
-	print(f"{a[-1] = }")

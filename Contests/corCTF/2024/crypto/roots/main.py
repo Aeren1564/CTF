@@ -10,35 +10,35 @@ PSIZE = 128
 getcontext().prec = 2024
 
 def chunk(inp: bytes, n: int) -> list[bytes]:
-    return [inp[i:i + n] for i in range(0, len(inp), n)]
+	return [inp[i:i + n] for i in range(0, len(inp), n)]
 
 def generate() -> list[int]:
-    return sorted(getPrime(PSIZE) for _ in range(N))
+	return sorted(getPrime(PSIZE) for _ in range(N))
 
 def otp(data: int) -> list[int]: # Returns N randbit of width MSIZE where xor equals data
-    key = [getrandbits(MSIZE) for _ in range(N - 1)]
+	key = [getrandbits(MSIZE) for _ in range(N - 1)]
 
-    # Apply multiple times for extra security! ;)
-    for k in key:
-        data ^= k
+	# Apply multiple times for extra security! ;)
+	for k in key:
+		data ^= k
 
-    return key + [data]
+	return key + [data]
 
 def enc(data: int, key: list[int]) -> Decimal:
-    return sum(a * Decimal(p).sqrt() for a, p in zip(otp(data), key))
+	return sum(a * Decimal(p).sqrt() for a, p in zip(otp(data), key))
 
 def encrypt(plaintext: bytes, key: list[int]) -> Decimal:
-    out = []
-    for pt in chunk(plaintext, MSIZE // 8):
-        out.append(enc(bytes_to_long(pt), key))
+	out = []
+	for pt in chunk(plaintext, MSIZE // 8):
+		out.append(enc(bytes_to_long(pt), key))
 
-    return out
+	return out
 
 def main() -> None:
-    key = generate() # key is N random prime of PSIZE bits
-    ct = encrypt(FLAG, key)
+	key = generate() # key is N random prime of PSIZE bits
+	ct = encrypt(FLAG, key)
 
-    print(ct)
+	print(ct)
 
 if __name__ == "__main__":
-    main()
+	main()
