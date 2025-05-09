@@ -1,6 +1,6 @@
 class mersenne_twister_breaker:
 	from symbolic_mersenne_twister import symbolic_mersenne_twister
-	from LinearAlgebra.linear_equation_solver_GF2 import linear_equation_solver_GF2
+	from Cryptography.LinearAlgebra.linear_equation_solver_GF2 import linear_equation_solver_GF2
 	recovery_mode = None
 	W, N, M, R = 32, 624, 397, 31
 	A = 0x9908B0DF
@@ -92,7 +92,7 @@ class mersenne_twister_breaker:
 		seed[1] = _recover_kj_from_Ji(s[2], s1_old, 2)
 		seed[623] = s[1] - (s1_old ^ (s[0] ^ s[0] >> 30) * 1664525) & 0xFFFFFFFF
 		if subtract_indices:
-			seed = [(2**32 + e - i) % 2**32 for i, e in enumerate(seed)]
+			seed = [(x - i) % 2**32 for i, x in enumerate(seed)]
 		return seed[ : ]
 	# Goal is to recover the initial state
 	def init_state(self, init_index):
@@ -157,6 +157,7 @@ class mersenne_twister_breaker:
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	def recover(self):
 		assert self.recovery_mode in range(3)
+		print(f"[INFO] <mersenne_twister_breaker> recovery begin with mode {'state' if self.recovery_mode == 0 else 'int' if self.recovery_mode == 1 else 'byte'}")
 		assignment, basis = self.solver.solve()
 		if len(basis) != 0:
 			print(f"[WARNING] <mersenne_twister_breaker> {2**len(basis)} solutions")
