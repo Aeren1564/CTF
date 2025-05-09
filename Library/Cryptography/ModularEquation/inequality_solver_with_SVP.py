@@ -47,6 +47,8 @@ class inequality_solver_with_SVP:
 		nr, nc = mat.dimensions()
 		if nr != nc:
 			print(f"[INFO] <inequality_solver_with_SVP> Aborting Gaussian heurstic: non-square matrix {nr} != {nc}")
+		elif nr >= 300:
+			print(f"[INFO] <inequality_solver_with_SVP> Aborting Gaussian heurstic: matrix too big")
 		else:
 			det = mat.determinant()
 			if det == 0:
@@ -76,14 +78,14 @@ class inequality_solver_with_SVP:
 				continue
 			assigned_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n)]
 			equation_value = [int(row[i] + (low[i] + high[i]) // 2 * row[-1]) // 2 for i in range(n, n + m)]
+			if any(not self.lows[i] <= equation_value[i] <= self.highs[i] for i in range(m)):
+				continue
 			if print_lattice:
 				print(f"[INFO] <inequality_solver_with_SVP>")
 				print(f"{row[-1] = }")
 				print(f"{assigned_value = }")
 				print(f"{equation_value = }")
 			if any(not self.var_low[i] <= assigned_value[i] <= self.var_high[i] for i in range(n)):
-				continue
-			if any(not self.lows[i] <= equation_value[i] <= self.highs[i] for i in range(m)):
 				continue
 			ret.append((assigned_value, equation_value))
 		if len(ret) == 0:
