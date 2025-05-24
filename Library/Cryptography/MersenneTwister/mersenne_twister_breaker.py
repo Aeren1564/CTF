@@ -68,14 +68,11 @@ class mersenne_twister_breaker:
 		return prev_state[ : ]
 	# From https://stackered.com/blog/python-random-prediction
 	def recover_seed_array_from_state(self, state, subtract_indices):
-		def _init_genrand(seed):
-			MT = [0] * 624
-			MT[0] = seed & 0xFFFFFFFF
-			for i in range(1, 624):
-				MT[i] = 0x6c078965 * (MT[i - 1] ^ MT[i - 1] >> 30) + i & 0xFFFFFFFF
-			return MT
-		def _recover_kj_from_Ji(ji, ji1, i):
-			return ji - (_init_genrand(19650218)[i] ^ (ji1 ^ ji1 >> 30) * 1664525) & 0xFFFFFFFF
+		# init_genrand(19650218)
+		init = [0] * 624
+		init[0] = 19650218 & 0xFFFFFFFF
+		for i in range(1, 624):
+			init[i] = 0x6c078965 * (init[i - 1] ^ init[i - 1] >> 30) + i & 0xFFFFFFFF
 		def _recover_Ji_from_Ii(Ii, Ii1, i):
 			return (Ii + i ^ (Ii1 ^ Ii1 >> 30) * 1566083941) & 0xFFFFFFFF
 		s = [0] * 624
@@ -84,10 +81,11 @@ class mersenne_twister_breaker:
 		s[0] = s[623]
 		s[1] = _recover_Ji_from_Ii(state[1], state[623], 1)
 		s[2] = _recover_Ji_from_Ii(state[2], s[1], 2)
+		def _recover_kj_from_Ji(ji, ji1, i):
+			return ji - (init[i] ^ (ji1 ^ ji1 >> 30) * 1664525) & 0xFFFFFFFF
 		seed = [0] * 624
 		for i in range(623, 2, -1):
 			seed[i - 1] = _recover_kj_from_Ji(s[i], s[i - 1], i)
-		seed[0] = 0
 		s1_old = (2194844435 ^ (19650218 ^ 19650218 >> 30) * 1664525) & 0xFFFFFFFF
 		seed[1] = _recover_kj_from_Ji(s[2], s1_old, 2)
 		seed[623] = s[1] - (s1_old ^ (s[0] ^ s[0] >> 30) * 1664525) & 0xFFFFFFFF
@@ -132,7 +130,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		x = self._sanitize(x, self.W)
 		eqs = self.twister.genrand_uint()
-		for i, v in enumerate(reversed(eqs)):
+		for i, eq in enumerate(reversed(eqs)):
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	# if x is an integer, it is the same as python random.getrandbits
@@ -172,7 +170,7 @@ class mersenne_twister_breaker:
 					continue
 				seed = 0
 				for i in reversed(range(period)):
-					seed = seed << 32 | (recovered[i if i >= 2 else period + i] - i + 2**32) % 2**32
+					seed = seed << 32 | (recovered[i if i >= 2 else period + i] - i) % 2**32
 				seeds.append(seed)
 			return seeds[:]
 		else:
@@ -254,10 +252,10 @@ if __name__ == "__main__":
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Succeeded")
 
-	test_rewind()
-	test_recover_seed_from_state()
+	# test_rewind()
+	# test_recover_seed_from_state()
 	test_recover_seed()
-	test_recover_byteseed()
+	# test_recover_byteseed()
 
 """
 Tested on

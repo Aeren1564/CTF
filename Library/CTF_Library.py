@@ -45,8 +45,8 @@ from base64 import b64encode, b64decode
 from multiprocessing import Pool
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from gmpy2 import isqrt, iroot
-from ast import literal_eval
-from copy import deepcopy
+import ast
+import copy
 from fractions import Fraction
 import string
 import numpy
