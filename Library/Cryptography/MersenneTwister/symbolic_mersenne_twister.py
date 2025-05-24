@@ -8,7 +8,7 @@ class symbolic_mersenne_twister:
 	F = 1812433253
 	def __init__(self, init_state = None, init_index = None):
 		if init_state == None:
-			init_state = [[(1 << (self.W * i + (self.W - 1 - j))) for j in range(self.W)] for i in range(self.N)]
+			init_state = [[1 << self.W * i + j for j in range(self.W)] for i in range(self.N)]
 		if init_index == None:
 			init_index = self.N
 		assert len(init_state) == self.N and all(len(s) == self.W for s in init_state)
@@ -20,20 +20,20 @@ class symbolic_mersenne_twister:
 		return [x ^ y for x, y in zip(a, b)]
 	@staticmethod
 	def _and(a, x):
-		return [v if (x >> (31 - i)) & 1 else 0 for i, v in enumerate(a)]
+		return [v if x >> i & 1 else 0 for i, v in enumerate(a)]
 	@staticmethod
 	def _shiftr(a, x):
-		return [0] * x + a[ : -x]
+		return a[x : ] + [0] * x
 	@staticmethod
 	def _shiftl(a, x):
-		return a[x : ] + [0] * x
+		return [0] * x + a[ : -x]
 	# https://github.com/python/cpython/blob/23362f8c301f72bbf261b56e1af93e8c52f5b6cf/Modules/_randommodule.c#L120
 	# Note that it returns in big endian order
 	def genrand_uint(self):
 		if self.index >= self.N:
 			for k in range(self.N):
-				y = self.state[k][ : 1] + self.state[(k + 1) % self.N][1 : ]
-				z = [y[-1] if self.A >> self.W - 1 - i & 1 else 0 for i in range(self.W)]
+				y = self.state[(k + 1) % self.N][ : -1] + self.state[k][-1 : ]
+				z = [y[0] if self.A >> i & 1 else 0 for i in range(self.W)]
 				self.state[k] = self._xor(self.state[(k + self.M) % self.N], self._shiftr(y, 1))
 				self.state[k] = self._xor(self.state[k], z)
 			self.index = 0
@@ -51,18 +51,18 @@ class symbolic_mersenne_twister:
 		if n == 0:
 			return []
 		if n <= self.W:
-			return self.genrand_uint()[ : n]
+			return self.genrand_uint()[-n : ]
 		arr = []
 		while n > 0:
 			r = self.genrand_uint()
 			if n < self.W:
-				r = r[ : n]
+				r = r[-n : ]
 			arr.append(r)
 			n -= self.W
-		return [x for r in reversed(arr) for x in r]
+		return [x for r in arr for x in r]
 	# https://github.com/python/cpython/blob/main/Lib/random.py#L288
 	# Note that it returns in big endian order
-	def randbytes(self, n):
+	def getrandbytes(self, n):
 		return self.getrandbits(8 * n)
 
 """

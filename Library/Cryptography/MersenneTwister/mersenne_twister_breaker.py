@@ -70,11 +70,11 @@ class mersenne_twister_breaker:
 	def recover_seed_array_from_state(self, state, subtract_indices):
 		# init_genrand(19650218)
 		init = [0] * 624
-		init[0] = 19650218 & 0xFFFFFFFF
+		init[0] = 19650218 & self.D
 		for i in range(1, 624):
-			init[i] = 0x6c078965 * (init[i - 1] ^ init[i - 1] >> 30) + i & 0xFFFFFFFF
+			init[i] = 0x6c078965 * (init[i - 1] ^ init[i - 1] >> 30) + i & self.D
 		def _recover_Ji_from_Ii(Ii, Ii1, i):
-			return (Ii + i ^ (Ii1 ^ Ii1 >> 30) * 1566083941) & 0xFFFFFFFF
+			return (Ii + i ^ (Ii1 ^ Ii1 >> 30) * 1566083941) & self.D
 		s = [0] * 624
 		for i in range(623, 2, -1):
 			s[i] = _recover_Ji_from_Ii(state[i], state[i - 1], i)
@@ -82,13 +82,13 @@ class mersenne_twister_breaker:
 		s[1] = _recover_Ji_from_Ii(state[1], state[623], 1)
 		s[2] = _recover_Ji_from_Ii(state[2], s[1], 2)
 		def _recover_kj_from_Ji(ji, ji1, i):
-			return ji - (init[i] ^ (ji1 ^ ji1 >> 30) * 1664525) & 0xFFFFFFFF
+			return ji - (init[i] ^ (ji1 ^ ji1 >> 30) * 1664525) & self.D
 		seed = [0] * 624
 		for i in range(623, 2, -1):
 			seed[i - 1] = _recover_kj_from_Ji(s[i], s[i - 1], i)
-		s1_old = (2194844435 ^ (19650218 ^ 19650218 >> 30) * 1664525) & 0xFFFFFFFF
+		s1_old = (2194844435 ^ (19650218 ^ 19650218 >> 30) * 1664525) & self.D
 		seed[1] = _recover_kj_from_Ji(s[2], s1_old, 2)
-		seed[623] = s[1] - (s1_old ^ (s[0] ^ s[0] >> 30) * 1664525) & 0xFFFFFFFF
+		seed[623] = s[1] - (s1_old ^ (s[0] ^ s[0] >> 30) * 1664525) & self.D
 		if subtract_indices:
 			seed = [(x - i) % 2**32 for i, x in enumerate(seed)]
 		return seed[ : ]
@@ -122,7 +122,7 @@ class mersenne_twister_breaker:
 		for i in range(self.N):
 			for j in range(self.W):
 				if equation >> self.W * i + j & 1:
-					eqs ^= self.twister.state[i][self.W - 1 - j]
+					eqs ^= self.twister.state[i][j]
 		assert self.solver.add_equation_if_consistent(eqs, output)
 	# if x is a string, it must of length self.W consisting of characters in "01?"
 	def setrand_uint(self, x):
@@ -130,7 +130,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		x = self._sanitize(x, self.W)
 		eqs = self.twister.genrand_uint()
-		for i, eq in enumerate(reversed(eqs)):
+		for i, eq in enumerate(eqs):
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	# if x is an integer, it is the same as python random.getrandbits
@@ -140,7 +140,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		x = self._sanitize(x, n)
 		eqs = self.twister.getrandbits(n)
-		for i, eq in enumerate(reversed(eqs)):
+		for i, eq in enumerate(eqs):
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	# if x is a bytes, it is the same as python random.randbytes
@@ -150,7 +150,7 @@ class mersenne_twister_breaker:
 		assert self.recovery_mode in range(3)
 		x = self._sanitize(x, n)
 		eqs = self.twister.getrandbits(8 * n)
-		for i, eq in enumerate(reversed(eqs)):
+		for i, eq in enumerate(eqs):
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	def recover(self):
@@ -229,6 +229,8 @@ if __name__ == "__main__":
 				breaker.add_equation_on_current_state(1 << 32 * i + j, state[i] >> j & 1)
 		for i in range(10):
 			breaker.setrandbits(12, r.getrandbits(12))
+		for i in range(10):
+			breaker.setrandbits(119, r.getrandbits(119))
 		recovered = breaker.recover()
 		assert seed0 in recovered and seed1 in recovered
 		print(f"[test_recover_seed] Succeeded")
@@ -252,10 +254,10 @@ if __name__ == "__main__":
 		assert recovered == byteseed
 		print(f"[test_recover_byteseed] Succeeded")
 
-	# test_rewind()
-	# test_recover_seed_from_state()
+	test_rewind()
+	test_recover_seed_from_state()
 	test_recover_seed()
-	# test_recover_byteseed()
+	test_recover_byteseed()
 
 """
 Tested on
