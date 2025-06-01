@@ -7,26 +7,21 @@ h3 = 'you win'
 with process(["python3", "chal.py"]) as io:
 	breaker = mersenne_twister_breaker()
 	breaker.init_state_after_seeding()
-	rng_call_cnt = 0
 
 	print(f"Mode 0")
 	jump = 2**32 // 6 + 1
 	for rnd in range(350):
 		print(f"{rnd = }")
-		rng_call_cnt += 1
 		eq_res = breaker.setrandbits(32)[:]
 		interact_cnt = 0
 		def interact(x):
-			global rng_call_cnt
 			global interact_cnt
 			interact_cnt += 1
 			assert interact_cnt <= 32
 			io.sendlineafter(b"> ", str(x).encode())
 			resp = io.readlineS().strip()
 			if resp != h3:
-				rng_call_cnt += 2
-				breaker.setrandbits(32)
-				breaker.setrandbits(32)
+				breaker.random()
 			return resp
 		val0 = interact(0)
 		assert val0 != h3
@@ -58,7 +53,6 @@ with process(["python3", "chal.py"]) as io:
 	while rnd + 1 < 2200:
 		rnd += 1
 		print(f"{rnd = }")
-		rng_call_cnt += 1
 		eq_res = breaker.setrandbits(32)
 		bbs = Bayesian_binary_searcher(1, 2**32 - 1)
 		for turn in range(64):
@@ -71,9 +65,7 @@ with process(["python3", "chal.py"]) as io:
 				print(f"{breaker.rank() = }")
 				print(f"{breaker.nullity() = }")
 				break
-			rng_call_cnt += 2
-			breaker.setrandbits(32)
-			breaker.setrandbits(32)
+			breaker.random()
 			if resp == h1:
 				bbs.update(x, (0.9, 0, 0.1))
 			else:
@@ -84,15 +76,13 @@ with process(["python3", "chal.py"]) as io:
 			print(f"{breaker.nullity() = }")
 		if breaker.nullity() == 0:
 			break
-	random.setstate(breaker.recover())
-	for _ in range(rng_call_cnt):
-		random.getrandbits(32)
+	rng = breaker.recover_final_rng()
 
 	print()
 	print(f"Mode 1-1")
 	while rnd + 1 < 2200:
 		rnd += 1
 		print(f"{rnd = }")
-		io.sendlineafter(b"> ", str(random.randint(1, 2**32 - 1)).encode())
+		io.sendlineafter(b"> ", str(rng.randint(1, 2**32 - 1)).encode())
 		assert io.readlineS().strip() == h3
 	print(f"{io.readallS(timeout = 1)}")

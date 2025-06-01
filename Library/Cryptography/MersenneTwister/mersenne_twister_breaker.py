@@ -99,6 +99,7 @@ class mersenne_twister_breaker:
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
 		self.init_index = init_index
 		self.twister = self.symbolic_mersenne_twister(init_index = self.init_index)
+	# Goal is to recover the initial state right after the seeding process
 	def init_state_after_seeding(self):
 		self.n, self.recovery_mode = self.W * self.N, 0
 		self.solver = self.linear_equation_solver_GF2(n = self.n)
@@ -146,7 +147,7 @@ class mersenne_twister_breaker:
 				assert 0 <= equation[i] < 2**self.n
 				assert self.solver.add_equation_if_consistent(equation[i], output >> i & 1)
 	# if x is None, it returns the equation for output of python random getrandbits(32)
-	# if x is an integer, it behave as if it read the output of python random getrandbits(32)
+	# if x is an integer, it behaves as if it read the output of python random getrandbits(32)
 	# if x is a string, it must of length self.W consisting of characters in "01?"
 	def setrand_uint(self, x = None):
 		assert self.recovery_mode in range(3)
@@ -159,7 +160,7 @@ class mersenne_twister_breaker:
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	# if x is None, it returns the equation for output of python random getrandbits(n)
-	# if x is an integer, it behave as if it read the output of python random getrandbits(n)
+	# if x is an integer, it behaves as if it read the output of python random getrandbits(n)
 	# if x is a string, it must be of length n consisting of characters in "01?"
 	def setrandbits(self, n, x = None):
 		assert self.recovery_mode in range(3)
@@ -172,7 +173,7 @@ class mersenne_twister_breaker:
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	# if x is None, it returns the equation for output of python random randbytes(n)
-	# if x is an integer, it returns the equation for output of python random randbytes(n)
+	# if x is an integer, it behaves as if it read the output of python random randbytes(n)
 	# if x is a string, it must be of length 8 * n consisting of characters in "01?"
 	def setrandbytes(self, n, x = None):
 		assert self.recovery_mode in range(3)
@@ -184,15 +185,35 @@ class mersenne_twister_breaker:
 		for i, eq in enumerate(eqs):
 			if x[i] != '?':
 				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
+	# if x is None, it returns the equation for output of python random random() * 2**53, which is an integer in range [0, 2**53)
+	# if x is a float, it behaves as if it read the output of python random random()
+	# if x is an integer, it behaves as if it read the output of python random random() * 2**53, which is an integer in range [0, 2**53)
+	# if x is a string, it must be of length 53 consisting of characters in "01?"
+	def random(self, x = None):
+		assert self.recovery_mode in range(3)
+		if x == None:
+			return self.twister.random()
+		if isinstance(x, float):
+			x = int(x * 2**53)
+		if isinstance(x, int):
+			assert 0 <= x < 2**53
+		x = self._sanitize(x, 53)
+		eqs = self.twister.random()
+		for i, eq in enumerate(eqs):
+			if x[i] != '?':
+				assert self.solver.add_equation_if_consistent(eq, int(x[i]))
 	def rank(self):
 		assert self.recovery_mode in range(3)
 		return self.solver.rank()
 	def nullity(self):
 		assert self.recovery_mode in range(3)
 		return self.solver.nullity()
+	def uint_call_count(self):
+		assert self.recovery_mode in range(3)
+		return self.twister.uint_call_count()
 	def recover(self):
 		assert self.recovery_mode in range(3)
-		print(f"[INFO] <mersenne_twister_breaker> recovery begin with mode {'state' if self.recovery_mode == 0 else 'int' if self.recovery_mode == 1 else 'byte'}")
+		print(f"[INFO] <mersenne_twister_breaker> recovery began with mode {'state' if self.recovery_mode == 0 else 'int' if self.recovery_mode == 1 else 'byte'}")
 		assignment, basis = self.solver.solve()
 		if len(basis) != 0:
 			print(f"[WARNING] <mersenne_twister_breaker> {2**len(basis)} solutions")
@@ -210,7 +231,7 @@ class mersenne_twister_breaker:
 					seed = seed << 32 | (recovered[i if i >= 2 else period + i] - i) % 2**32
 				seeds.append(seed)
 			return seeds
-		else:
+		elif self.recovery_mode == 2:
 			from hashlib import sha512
 			# Assumes that len(seed) + 64(512/8) + 12 <= 624 * 4 (in bytes)
 			recovered = bytes([x >> 8 * i & 0xFF for x in reversed(self.recover_seed_array_from_state(state, True)) for i in range(3, -1, -1)])
@@ -220,6 +241,38 @@ class mersenne_twister_breaker:
 					return pref[-l : ]
 			print("[ERROR] <mersenne_twister_breaker> Failed to recover the seed")
 			assert False
+		else:
+			assert False
+	def recover_initial_rng(self, return_seed_as_well = False):
+		assert self.recovery_mode in range(3)
+		from random import Random
+		rng = Random()
+		seed = self.recover()
+		if self.recovery_mode == 0:
+			rng.setstate(seed)
+		elif self.recovery_mode == 1:
+			rng.seed(seed)
+		elif self.recovery_mode == 2:
+			rng.seed(seed)
+		else:
+			assert False
+		return (rng, seed) if return_seed_as_well else rng
+	def recover_final_rng(self, return_seed_as_well = False):
+		assert self.recovery_mode in range(3)
+		from random import Random
+		rng = Random()
+		seed = self.recover()
+		if self.recovery_mode == 0:
+			rng.setstate(seed)
+		elif self.recovery_mode == 1:
+			rng.seed(seed)
+		elif self.recovery_mode == 2:
+			rng.seed(seed)
+		else:
+			assert False
+		for _ in range(self.uint_call_count()):
+			rng.getrandbits(32)
+		return (rng, seed) if return_seed_as_well else rng
 
 if __name__ == "__main__":
 	import random

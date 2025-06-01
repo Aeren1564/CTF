@@ -15,6 +15,7 @@ class symbolic_mersenne_twister:
 		assert 0 <= init_index <= self.N
 		self.state = init_state
 		self.index = init_index
+		self._uint_call_count = 0
 	@staticmethod
 	def _xor(a, b):
 		return [x ^ y for x, y in zip(a, b)]
@@ -29,6 +30,7 @@ class symbolic_mersenne_twister:
 		return [0] * x + a[ : -x]
 	# https://github.com/python/cpython/blob/23362f8c301f72bbf261b56e1af93e8c52f5b6cf/Modules/_randommodule.c#L120
 	def genrand_uint(self):
+		self._uint_call_count += 1
 		if self.index >= self.N:
 			for k in range(self.N):
 				y = self.state[(k + 1) % self.N][ : -1] + self.state[k][-1 : ]
@@ -59,9 +61,15 @@ class symbolic_mersenne_twister:
 			n -= self.W
 		return [x for r in arr for x in r]
 	# https://github.com/python/cpython/blob/main/Lib/random.py#L288
-	# Note that it returns in big endian order
 	def getrandbytes(self, n):
 		return self.getrandbits(8 * n)
+	# https://github.com/python/cpython/blob/ebf6d13567287d04683dab36f52cde7a3c9915e7/Modules/_randommodule.c#L187-L193
+	# Returns equation for random() * 2**53, which will be an integer in range [0, 2**53)
+	def random(self):
+		a, b = self.genrand_uint(), self.genrand_uint()
+		return b[6:] + a[5:]
+	def uint_call_count(self):
+		return self._uint_call_count
 
 """
 Tested on
