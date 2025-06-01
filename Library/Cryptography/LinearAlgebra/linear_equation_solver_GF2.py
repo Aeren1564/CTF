@@ -28,6 +28,10 @@ class linear_equation_solver_GF2:
 			self.equations_and_outputs[i] = min(self.equations_and_outputs[i], self.equations_and_outputs[i] ^ equation_and_output)
 		self.equations_and_outputs.append(equation_and_output)
 		return True
+	def rank(self):
+		return len(self.equations_and_outputs)
+	def nullity(self):
+		return self.n - len(self.equations_and_outputs)
 	# Returns (An assignment A, a basis B for solution set)
 	# i.e. # of solutions is 2**len(B) and all solution can uniquely be represented as A + sum(S) where S is a subset of B
 	def solve(self):

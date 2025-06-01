@@ -28,7 +28,6 @@ class symbolic_mersenne_twister:
 	def _shiftl(a, x):
 		return [0] * x + a[ : -x]
 	# https://github.com/python/cpython/blob/23362f8c301f72bbf261b56e1af93e8c52f5b6cf/Modules/_randommodule.c#L120
-	# Note that it returns in big endian order
 	def genrand_uint(self):
 		if self.index >= self.N:
 			for k in range(self.N):
@@ -43,9 +42,8 @@ class symbolic_mersenne_twister:
 		y = self._xor(y, self._and(self._shiftl(y, self.T), self.C))
 		y = self._xor(y, self._shiftr(y, self.L))
 		self.index += 1
-		return y
+		return y[:]
 	# https://github.com/python/cpython/blob/23362f8c301f72bbf261b56e1af93e8c52f5b6cf/Modules/_randommodule.c#L471
-	# Note that it returns in big endian order
 	def getrandbits(self, n):
 		assert 0 <= n
 		if n == 0:
@@ -56,7 +54,7 @@ class symbolic_mersenne_twister:
 		while n > 0:
 			r = self.genrand_uint()
 			if n < self.W:
-				r = r[-n : ]
+				r = r[-n :]
 			arr.append(r)
 			n -= self.W
 		return [x for r in arr for x in r]
