@@ -26,6 +26,18 @@ class inequality_solver_with_SVP:
 	# Add equality coef[0] * x[0] + ... + coef[-1] * x[-1] + t * mod = value
 	def add_equality(self, coef : list, value : int, mod = 0):
 		self.add_inequality(coef, value, value, mod)
+	def add_inequality_with_pairs(self, coef_pairs : list, low : int, high : int, mod = 0):
+		coef = [0] * self.n
+		for i, x in coef_pairs:
+			assert 0 <= i < self.n and coef[i] == 0
+			coef[i] = x
+		self.add_inequality(coef, low, high, mod)
+	def add_equality_with_pairs(self, coef_pairs : list, value : int, mod = 0):
+		coef = [0] * self.n
+		for i, x in coef_pairs:
+			assert 0 <= i < self.n and coef[i] == 0
+			coef[i] = x
+		self.add_equality(coef, value, mod)
 	# Try different construction if # of estimated solutions (by Gaussian heuristic) is too large
 	def solve(self, print_lattice = False):
 		print(f"[STARTED] <inequality_solver_with_SVP>")

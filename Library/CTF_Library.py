@@ -33,7 +33,7 @@ for dirpath, directory_names, filenames in os.walk(folder_path):
 from sage.all import *
 from sage.rings.factorint import factor_trial_division
 proof.all(False)
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES, DES
 from Crypto.Hash import SHA256
 from Crypto.Util.number import bytes_to_long, long_to_bytes, inverse, ceil_div, size, isPrime, getPrime, getStrongPrime, getRandomInteger, getRandomNBitInteger, getRandomRange
 from Crypto.Util.Padding import pad, unpad

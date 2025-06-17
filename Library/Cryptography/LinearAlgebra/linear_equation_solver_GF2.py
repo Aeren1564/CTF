@@ -20,9 +20,7 @@ class linear_equation_solver_GF2:
 	def add_equation_if_consistent(self, equation, output : int):
 		equation, output = self._reduce(equation, output)
 		if equation == 0:
-			if output != 0:
-				return False
-			return True
+			return output == 0
 		equation_and_output = equation << 1 | output
 		for i in range(len(self.equations_and_outputs)):
 			self.equations_and_outputs[i] = min(self.equations_and_outputs[i], self.equations_and_outputs[i] ^ equation_and_output)
