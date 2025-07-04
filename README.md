@@ -1,3 +1,3 @@
 # CTF
 
-Repository for maintaining CTF Library, upsolving, and writeups.
+Repository for maintaining CTF upsolving and writeups.
