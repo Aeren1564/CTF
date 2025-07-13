@@ -7,6 +7,6 @@
 - [x] anglerfish
 - [ ] exchange (Blockchain)
 - [x] monkfish
-- [ ] roots
+- [x] roots
 - [x] steps
 - [ ] two-wrongs (Quantum Computing)

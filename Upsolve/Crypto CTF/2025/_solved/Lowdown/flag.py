@@ -1,0 +1,1 @@
+flag = "CCTF{TESTFLAG12323434}"
