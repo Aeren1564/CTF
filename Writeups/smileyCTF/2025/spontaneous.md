@@ -1,15 +1,23 @@
+# Challenge files
+
+[Link](https://github.com/Aeren1564/CTF/tree/main/Upsolve/smileyCTF/2025/spontaneous)
+
+# Solution
+
 Our goal is to make `last_comm` filled with the same value, so that after inverse FFT, it will have degree $\le 1$. I will present a solution which makes `last_comm` all zeroes.
 
 We can represent our payload as a sequence of arrays $L_0, \cdots, L_6$ representing the leaf values in the Merkle trees. In particular, $L_i$ will be an array of length $256 \times 2^{6-i}$, and $L_6$ will be equal to `last_comm`.
 
-### Observation 1
+## Observation 1
+
 - Indices with different remainder modulo $256$ does not affect each other during verification.
 
 We'll now group every index with remainder $r$ modulo $256$, for each remainders $0 \le r < 256$.
 
 Let's say on a round, an index went through a **normal transition** if it will pass the verifier check if the index was selected for query in that round. Otherwise, it went through an **abnormal transition**. In my solution, all abnormal transitions will set the next value to $0$.
 
-### Observation 2
+## Observation 2
+
 - If for some $0 \le i \le 6$ and $0 \le r < 256$, every value in group $r$ in $L_i$ were 0, for all $i < j \le 6$ every value in group $r$ in $L_j$ is $0$ as well, assuming all such values went through a normal transition.
 
 For each group, we want it to go through an abnormal transition in a single round, and through a normal transition in other $5$ rounds.
@@ -58,6 +66,8 @@ $$
 $$
 
 The maximum probability can be reached by setting $k_0 = \cdots = k_5 = \frac16$, and we're expected to pass the verification in about 6320 tries on average.
+
+# Implementation
 
 ```python
 from math import log2, ceil
