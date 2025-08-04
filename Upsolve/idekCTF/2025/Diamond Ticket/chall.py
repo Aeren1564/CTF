@@ -1,0 +1,52 @@
+from Crypto.Util.number import *
+
+#Some magic from Willy Wonka
+p = 170829625398370252501980763763988409583
+a = 164164878498114882034745803752027154293
+b = 125172356708896457197207880391835698381
+
+def chocolate_generator(m:int) -> int:
+    return (pow(a, m, p) + pow(b, m, p)) % p
+
+#The diamond ticket is hiding inside chocolate
+diamond_ticket = open("flag.txt", "rb").read()
+assert len(diamond_ticket) == 26
+assert diamond_ticket[:5] == b"idek{"
+assert diamond_ticket[-1:] == b"}"
+diamond_ticket = bytes_to_long(diamond_ticket[5:-1])
+
+flag_chocolate = chocolate_generator(diamond_ticket)
+chocolate_bag = []
+
+#Willy Wonka are making chocolates
+for i in range(1337):
+    chocolate_bag.append(getRandomRange(1, p))
+
+#And he put the golden ticket at the end
+chocolate_bag.append(flag_chocolate)
+
+#Augustus ate lots of chocolates, but he can't eat all cuz he is full now :D
+remain = chocolate_bag[-5:]
+
+#Compress all remain chocolates into one
+remain_bytes = b"".join([c.to_bytes(p.bit_length()//8, "big") for c in remain])
+
+#The last chocolate is too important, so Willy Wonka did magic again
+P = getPrime(512)
+Q = getPrime(512)
+N = P * Q
+e = bytes_to_long(b"idek{this_is_a_fake_flag_lolol}")
+d = pow(e, -1, (P - 1) * (Q - 1))
+c1 = pow(bytes_to_long(remain_bytes), e, N)
+c2 = pow(bytes_to_long(remain_bytes), 2, N) # A small gift
+
+#How can you get it ?
+print(f"{N = }")
+print(f"{c1 = }")
+print(f"{c2 = }") 
+
+"""
+N = 85494791395295332945307239533692379607357839212287019473638934253301452108522067416218735796494842928689545564411909493378925446256067741352255455231566967041733698260315140928382934156213563527493360928094724419798812564716724034316384416100417243844799045176599197680353109658153148874265234750977838548867
+c1 = 27062074196834458670191422120857456217979308440332928563784961101978948466368298802765973020349433121726736536899260504828388992133435359919764627760887966221328744451867771955587357887373143789000307996739905387064272569624412963289163997701702446706106089751532607059085577031825157942847678226256408018301
+c2 = 30493926769307279620402715377825804330944677680927170388776891152831425786788516825687413453427866619728035923364764078434617853754697076732657422609080720944160407383110441379382589644898380399280520469116924641442283645426172683945640914810778133226061767682464112690072473051344933447823488551784450844649
+"""

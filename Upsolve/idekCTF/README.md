@@ -12,3 +12,12 @@
 - [x] Seedy (Mersenne Twister)
 - [ ] summertime
 - [ ] Tensor Glare
+
+## 2025
+- [x] Catch
+- [x] Diamond Ticket
+- [x] FITM
+- [x] Happy ECC
+- [x] Happy ECC - Revenge
+- [x] Sadness ECC
+- [x] Sadness ECC - Revenge

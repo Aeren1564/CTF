@@ -154,13 +154,13 @@ for _ in range(n // connection_chunk):
 				encs.append(bytes.fromhex(data[i][2:]) + bytes.fromhex(data[i + 1][1:]))
 	for enc in encs:
 		for bit in range(flag_len):
-				cnt[bit][
-					get_bit(enc, bit) ^
-					get_bit(enc, bit + 1) ^
-					get_bit(enc, bit + 2) ^
-					get_bit(enc, bit + 7) ^
-					get_bit(enc, bit + 128)
-				] += 1
+			cnt[bit][
+				get_bit(enc, bit) ^
+				get_bit(enc, bit + 1) ^
+				get_bit(enc, bit + 2) ^
+				get_bit(enc, bit + 7) ^
+				get_bit(enc, bit + 128)
+			] += 1
 	flag = [0] * (flag_len // 8)
 	for bit in range(flag_len):
 		x = int(cnt[bit][0] < cnt[bit][1])
