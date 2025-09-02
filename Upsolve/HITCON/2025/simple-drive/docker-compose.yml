@@ -1,0 +1,18 @@
+services:
+  simple-drive:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/drive:ro
+      - ./flag:/flag:ro
+    ports:
+      - ${PORT:-5487}:5487
+    tmpfs:
+      - /tmp:size=16M
+    stop_grace_period: 1s
+    deploy:
+      resources:
+        limits:
+          cpus: 0.1
+          memory: 64M

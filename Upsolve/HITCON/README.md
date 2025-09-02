@@ -1,6 +1,6 @@
 # Checklist
 
-## 2024 Qualifier
+## 2024
 
 ### Crypto
 
@@ -10,3 +10,15 @@
 - [ ] MatProd
 - [ ] PCBC Revenge
 - [ ] ZKPoF
+
+## 2025
+
+### Crypto
+
+- [ ] BabyLWE
+- [ ] Granular Counter Mode
+- [x] MRSA
+- [ ] Paranoid
+- [ ] Pedantic
+- [ ] simple-drive
+- [ ] simple-drive-revenge
